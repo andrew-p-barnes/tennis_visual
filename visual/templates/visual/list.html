@@ -1,0 +1,19 @@
+{% extends 'visual/base.html' %}
+{% block content %}
+
+
+
+<select class="selectpicker" multiple>
+  <option>Mustard</option>
+  <option>Ketchup</option>
+  <option>Barbecue</option>
+</select>
+
+<script>
+$(document).ready(function() {
+   $('.selectpicker').selectpicker();
+});
+</script>
+
+
+{% endblock %}

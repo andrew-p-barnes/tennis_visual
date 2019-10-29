@@ -1,0 +1,284 @@
+{% extends 'visual/base.html' %}
+{% block content %}
+
+<div>
+    <h1>Event List</h1>
+</div>
+
+{% for event in events %}
+    <div>
+        <h2>name: {{ event.name }}</h2>
+        <p>year: {{ event.year }}</p>
+        <p>type: {{ event.ranking_type }}</p>
+        <p>setting: {{ event.setting }}</p>
+        <p>surface: {{ event.court_surface }}</p>
+    </div>
+{% endfor %}
+
+<select class="selectpicker" multiple id="playerPickerSelect">
+    {% for player in players %}
+    <option value="{{ player.first_name }} {{ player.last_name }}" selected>{{ player.first_name }} {{ player.last_name }}</option>
+    {% endfor %}
+</select>
+<button type="button" class="btn btn-default" id="playerPickerBtn">Pick players</button>
+
+<div id="myBarChartWrapper"></div>
+
+<canvas id="myPieChart" width="100" height="100"></canvas>
+
+<script>
+$(document).ready(function() {
+    $('.selectpicker').selectpicker();
+});
+
+var events;
+var barChart;
+
+let promise = new Promise(function(resolve, reject) {
+    $.ajax({
+        type: "GET",
+        url: "event",
+        success: function(events_json){
+            events = JSON.parse(events_json);
+            console.log(events);
+            resolve(console.log("it works"));
+        }
+    })
+});
+
+promise.then(function(result) {
+
+    function prepareBarChartLabels(events) {
+
+        console.log(events.length);
+
+        var yearsSet = new Set();
+
+        for (var i = 0; i < events.length; i++) {
+            yearsSet.add(events[i].fields.year);
+        }
+
+        var yearsArray = Array.from(yearsSet);
+        yearsArray.sort();
+        return yearsArray;
+    }
+
+    function prepareBarChartData(events, barChartLabels) {
+
+        var numEventsMap = new Map();
+
+        for (var i = 0; i < barChartLabels.length; i++) {
+            numEventsMap.set(barChartLabels[i], 0);
+        }
+
+        for (var i = 0; i < events.length; i++) {
+            var eventCount = numEventsMap.get(events[i].fields.year);
+            eventCount++;
+            numEventsMap.set(events[i].fields.year, eventCount);
+        }
+
+        console.log(numEventsMap);
+
+        var numEventsArray = [];
+
+        for (var i = 0; i < barChartLabels.length; i++) {
+            var eventCount = numEventsMap.get(barChartLabels[i]);
+            numEventsArray.push(eventCount);
+        }
+        return numEventsArray;
+    }
+
+    function drawBarChart(barChartLabels, barChartData) {
+
+        if (document.getElementById('myBarChart')) {
+            var chartCanvas = document.getElementById('myBarChart');
+            chartCanvas.parentNode.removeChild(chartCanvas);
+        }
+        
+        chartCanvas = document.createElement("canvas");
+        chartCanvas.setAttribute("id","myBarChart");
+        chartCanvas.setAttribute("width","100");
+        chartCanvas.setAttribute("height","100");
+        document.getElementById('myBarChartWrapper').appendChild(chartCanvas);
+
+        var bar_ctx = document.getElementById('myBarChart');
+        barChart = new Chart(bar_ctx, {
+            type: 'bar',
+            data: {
+                labels: barChartLabels,
+                datasets: [{
+                    label: '# of Events',
+                    data: barChartData,
+                    backgroundColor: [
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(5, 9, 64, 0.2)',
+                        'rgba(55, 15, 64, 0.2)',
+                        'rgba(205, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(5, 9, 64, 0.2)',
+                        'rgba(55, 15, 64, 0.2)',
+                        'rgba(205, 159, 64, 0.2)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+    }
+
+    function drawPieChart(events) {
+
+        var surfacesSet = new Set();
+
+        for (var i = 0; i < events.length; i++) {
+            surfacesSet.add(events[i].fields.court_surface);
+        }
+
+        var surfacesArray = Array.from(surfacesSet);
+        surfacesArray.sort();
+
+        var numEventsMap = new Map();
+
+        for (var i = 0; i < surfacesArray.length; i++) {
+            numEventsMap.set(surfacesArray[i], 0);
+        }
+
+        for (var i = 0; i < events.length; i++) {
+            var eventCount = numEventsMap.get(events[i].fields.court_surface);
+            eventCount++;
+            numEventsMap.set(events[i].fields.court_surface, eventCount);
+        }
+
+        console.log(numEventsMap);
+
+        var numEventsArray = [];
+
+        for (var i = 0; i < surfacesArray.length; i++) {
+            var eventCount = numEventsMap.get(surfacesArray[i]);
+            numEventsArray.push(eventCount);
+        }
+
+        var pie_ctx = document.getElementById('myPieChart');
+        var pieChart = new Chart(pie_ctx, {
+            type: 'pie',
+            data: {
+                labels: surfacesArray,
+                datasets: [{
+                    data: numEventsArray,
+                    backgroundColor: [
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(53, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(200, 19, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(53, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(200, 19, 64, 0.2)'
+                    ],
+                    borderWidth: 1
+                }]
+            }
+        });
+    }
+
+    function removeData(chart) {
+        chart.data.labels.pop();
+        chart.data.datasets.forEach((dataset) => {
+            dataset.data.pop();
+        });
+        chart.update();
+    }
+
+    function updateChart(chart, newLabels, newData) {
+        chart.data.labels = newLabels;
+        chart.data.datasets.data = newData;
+        chart.update();
+    }
+
+    barChartLabels = prepareBarChartLabels(events);
+    barChartData = prepareBarChartData(events, barChartLabels);
+    drawBarChart(barChartLabels, barChartData);
+    drawPieChart(events);
+
+    $("#playerPickerBtn").on( "click", function() {
+        console.log("player picker");
+        var players = $("#playerPickerSelect").val();
+        var playersArray = players.toString().split(",");
+        console.log("players picked " + playersArray);
+        var playersLastNameArray = [];
+        var playersLastNameStr = "";
+        for (var i = 0; i < playersArray.length; i++) {
+            playersLastNameArray.push(playersArray[i].split(" ")[1]);
+            playersLastNameStr = playersLastNameStr + " " + playersArray[i].split(" ")[1];
+        }
+        playersLastNameStr = playersLastNameStr.trim();
+        console.log(playersLastNameArray);
+        console.log(playersLastNameStr);
+
+        $.ajax({
+            type: "GET",
+            url: "select_player",
+            data: {lastNames: playersLastNameStr},
+            success: function(selected_events_json){
+                selectedEvents = JSON.parse(selected_events_json);
+                console.log(selectedEvents);
+                <!--removeData(barChart);-->
+                barChartLabels = prepareBarChartLabels(selectedEvents);
+                barChartData = prepareBarChartData(selectedEvents, barChartLabels);
+                console.log(barChartLabels);
+                console.log(barChartData);
+                <!--updateChart(barChart, barChartLabels, barChartData);-->
+                drawBarChart(barChartLabels, barChartData);
+            }
+        })
+    });
+});
+
+</script>
+
+<button type="button" id="player_details_btn">Display player details</button>
+
+<script>
+    $('#player_details_btn').click(function(){
+    console.log("clicked")
+        $.ajax({
+            type: "GET",
+            url: "player",
+            success: function(players_json){
+                players = JSON.parse(players_json);
+                console.log(players)
+                var div = document.createElement("div");
+                div.id = "player_details";
+                document.body.appendChild(div);
+                for (var i = 0; i < players.length; i++) {
+                    var name = document.createElement("p");
+                    name.innerText = "Player name: " + players[i].fields.first_name + " " + players[i].fields.last_name;
+                    document.getElementById("player_details").appendChild(name);
+                    var dob = document.createElement("p");
+                    dob.innerText = "Date of birth: " + players[i].fields.date_of_birth;
+                    document.getElementById("player_details").appendChild(dob);
+                    var nationality = document.createElement("p");
+                    nationality.innerText = "Nationality: " + players[i].fields.nationality;
+                    document.getElementById("player_details").appendChild(nationality);
+                }
+            }
+        })
+    });
+
+</script>
+
+{% endblock %}
