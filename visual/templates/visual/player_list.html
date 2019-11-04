@@ -23,8 +23,8 @@
 <button type="button" class="btn btn-default" id="playerPickerBtn">Pick players</button>
 
 <div id="myBarChartWrapper"></div>
-
-<canvas id="myPieChart" width="100" height="100"></canvas>
+<div id="myStackedBarChartWrapper"></div>
+<div id="myPieChartWrapper"></div>
 
 <script>
 $(document).ready(function() {
@@ -33,13 +33,15 @@ $(document).ready(function() {
 
 var events;
 var barChart;
+var pieChart;
+var stackedBarChart;
 
 let promise = new Promise(function(resolve, reject) {
     $.ajax({
         type: "GET",
         url: "event",
         success: function(events_json){
-            events = JSON.parse(events_json);
+            events = events_json;
             console.log(events);
             resolve(console.log("it works"));
         }
@@ -55,7 +57,7 @@ promise.then(function(result) {
         var yearsSet = new Set();
 
         for (var i = 0; i < events.length; i++) {
-            yearsSet.add(events[i].fields.year);
+            yearsSet.add(events[i].year);
         }
 
         var yearsArray = Array.from(yearsSet);
@@ -72,9 +74,9 @@ promise.then(function(result) {
         }
 
         for (var i = 0; i < events.length; i++) {
-            var eventCount = numEventsMap.get(events[i].fields.year);
+            var eventCount = numEventsMap.get(events[i].year);
             eventCount++;
-            numEventsMap.set(events[i].fields.year, eventCount);
+            numEventsMap.set(events[i].year, eventCount);
         }
 
         console.log(numEventsMap);
@@ -94,7 +96,7 @@ promise.then(function(result) {
             var chartCanvas = document.getElementById('myBarChart');
             chartCanvas.parentNode.removeChild(chartCanvas);
         }
-        
+
         chartCanvas = document.createElement("canvas");
         chartCanvas.setAttribute("id","myBarChart");
         chartCanvas.setAttribute("width","100");
@@ -138,45 +140,64 @@ promise.then(function(result) {
         });
     }
 
-    function drawPieChart(events) {
+    function preparePieChartLabels(events) {
 
         var surfacesSet = new Set();
 
         for (var i = 0; i < events.length; i++) {
-            surfacesSet.add(events[i].fields.court_surface);
+            surfacesSet.add(events[i].court_surface);
         }
 
         var surfacesArray = Array.from(surfacesSet);
         surfacesArray.sort();
+        return surfacesArray;
+    }
+
+    function preparePieChartData(events, pieChartLabels) {
 
         var numEventsMap = new Map();
 
-        for (var i = 0; i < surfacesArray.length; i++) {
-            numEventsMap.set(surfacesArray[i], 0);
+        for (var i = 0; i < pieChartLabels.length; i++) {
+            numEventsMap.set(pieChartLabels[i], 0);
         }
 
         for (var i = 0; i < events.length; i++) {
-            var eventCount = numEventsMap.get(events[i].fields.court_surface);
+            var eventCount = numEventsMap.get(events[i].court_surface);
             eventCount++;
-            numEventsMap.set(events[i].fields.court_surface, eventCount);
+            numEventsMap.set(events[i].court_surface, eventCount);
         }
 
         console.log(numEventsMap);
 
         var numEventsArray = [];
 
-        for (var i = 0; i < surfacesArray.length; i++) {
-            var eventCount = numEventsMap.get(surfacesArray[i]);
+        for (var i = 0; i < pieChartLabels.length; i++) {
+            var eventCount = numEventsMap.get(pieChartLabels[i]);
             numEventsArray.push(eventCount);
         }
+        return numEventsArray;
+    }
+
+    function drawPieChart(pieChartLabels, pieChartData) {
+
+        if (document.getElementById('myPieChart')) {
+            var chartCanvas = document.getElementById('myPieChart');
+            chartCanvas.parentNode.removeChild(chartCanvas);
+        }
+
+        chartCanvas = document.createElement("canvas");
+        chartCanvas.setAttribute("id","myPieChart");
+        chartCanvas.setAttribute("width","100");
+        chartCanvas.setAttribute("height","100");
+        document.getElementById('myPieChartWrapper').appendChild(chartCanvas);
 
         var pie_ctx = document.getElementById('myPieChart');
         var pieChart = new Chart(pie_ctx, {
             type: 'pie',
             data: {
-                labels: surfacesArray,
+                labels: pieChartLabels,
                 datasets: [{
-                    data: numEventsArray,
+                    data: pieChartData,
                     backgroundColor: [
                         'rgba(153, 102, 255, 0.2)',
                         'rgba(53, 102, 255, 0.2)',
@@ -195,24 +216,148 @@ promise.then(function(result) {
         });
     }
 
-    function removeData(chart) {
-        chart.data.labels.pop();
-        chart.data.datasets.forEach((dataset) => {
-            dataset.data.pop();
-        });
-        chart.update();
+    function prepareStackedBarChartAxisLabels(events) {
+
+        console.log(events.length);
+
+        var yearsSet = new Set();
+
+        for (var i = 0; i < events.length; i++) {
+            yearsSet.add(events[i].year);
+        }
+
+        var yearsArray = Array.from(yearsSet);
+        yearsArray.sort();
+        console.log("stack years array");
+        console.log(yearsArray);
+        return yearsArray;
     }
 
-    function updateChart(chart, newLabels, newData) {
-        chart.data.labels = newLabels;
-        chart.data.datasets.data = newData;
-        chart.update();
+    function prepareStackedBarChartColumnLabels(events) {
+
+        console.log(events.length);
+
+        var playersSet = new Set();
+
+        for (var i = 0; i < events.length; i++) {
+            playersSet.add(events[i].last_name);
+        }
+
+        var playersArray = Array.from(playersSet);
+        playersArray.sort();
+        console.log("stack players array");
+        console.log(playersArray);
+        return playersArray;
     }
+
+    function prepareStackedBarChartData(events, stackedBarChartAxisLabels, stackedBarChartColumnLabels) {
+
+        numEventsData = [];
+        console.log("players in stacked data");
+        console.log(stackedBarChartColumnLabels.length);
+
+        for (var i = 0; i < stackedBarChartColumnLabels.length; i++) {
+
+            console.log(stackedBarChartColumnLabels[i]);
+            var numEventsMap = new Map();
+
+            for (var j = 0; j < stackedBarChartAxisLabels.length; j++) {
+                numEventsMap.set(stackedBarChartAxisLabels[j], 0);
+            }
+
+            console.log(stackedBarChartColumnLabels[i]);
+
+            for (var j = 0; j < events.length; j++) {
+                var eventCount = numEventsMap.get(events[j].year);
+                if (events[j].last_name ===  stackedBarChartColumnLabels[i]) {
+                    eventCount++;
+                    numEventsMap.set(events[j].year, eventCount);
+                }
+            }
+            console.log(stackedBarChartColumnLabels[i]);
+            console.log(numEventsMap);
+
+            var numEventsArray = [];
+
+            for (var j = 0; j < stackedBarChartAxisLabels.length; j++) {
+                var eventCount = numEventsMap.get(stackedBarChartAxisLabels[j]);
+                numEventsArray.push(eventCount);
+            }
+            numEventsData.push(numEventsArray);
+        }
+
+        backgroundColorArray = ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)'];
+
+        var stackedBarChartData = {};
+        stackedBarChartData.labels = stackedBarChartAxisLabels;
+        var playerDatasets = [];
+
+        for (var i = 0; i < stackedBarChartColumnLabels.length; i++) {
+            var playerDataset = {};
+            playerDataset.label = stackedBarChartColumnLabels[i];
+            playerDataset.backgroundColor = backgroundColorArray[i];
+            playerDataset.data = numEventsData[i];
+            playerDatasets.push(playerDataset);
+        }
+        stackedBarChartData.datasets = playerDatasets;
+        console.log(stackedBarChartData);
+        return stackedBarChartData;
+    }
+
+    function drawStackedBarChart(stackedBarChartData) {
+
+        if (document.getElementById('myStackedBarChart')) {
+            var chartCanvas = document.getElementById('myStackedBarChart');
+            chartCanvas.parentNode.removeChild(chartCanvas);
+        }
+
+        chartCanvas = document.createElement("canvas");
+        chartCanvas.setAttribute("id","myStackedBarChart");
+        chartCanvas.setAttribute("width","100");
+        chartCanvas.setAttribute("height","100");
+        document.getElementById('myStackedBarChartWrapper').appendChild(chartCanvas);
+
+        var bar_ctx = document.getElementById('myStackedBarChart');
+        barChart = new Chart(bar_ctx, {
+            type: 'bar',
+            data: stackedBarChartData,
+            options: {
+			    title: {
+					display: true,
+					text: 'Chart.js Bar Chart - Stacked'
+				},
+				tooltips: {
+					mode: 'index',
+					intersect: false
+				},
+				responsive: true,
+				scales: {
+					xAxes: [{
+						stacked: true,
+					}],
+					yAxes: [{
+						stacked: true
+					}]
+				}
+			}
+		});
+	};
 
     barChartLabels = prepareBarChartLabels(events);
     barChartData = prepareBarChartData(events, barChartLabels);
     drawBarChart(barChartLabels, barChartData);
-    drawPieChart(events);
+
+    pieChartLabels = preparePieChartLabels(events);
+    pieChartData = preparePieChartData(events, pieChartLabels);
+    drawPieChart(pieChartLabels, pieChartData);
+
+    stackedBarChartAxisLabels = prepareStackedBarChartAxisLabels(events);
+    console.log(stackedBarChartAxisLabels);
+    stackedBarChartColumnLabels = prepareStackedBarChartColumnLabels(events);
+    console.log(stackedBarChartColumnLabels);
+    stackedBarChartData = prepareStackedBarChartData(events, stackedBarChartAxisLabels, stackedBarChartColumnLabels);
+    console.log(stackedBarChartData);
+    drawStackedBarChart(stackedBarChartData);
 
     $("#playerPickerBtn").on( "click", function() {
         console.log("player picker");
@@ -234,15 +379,20 @@ promise.then(function(result) {
             url: "select_player",
             data: {lastNames: playersLastNameStr},
             success: function(selected_events_json){
-                selectedEvents = JSON.parse(selected_events_json);
+                selectedEvents = selected_events_json;
                 console.log(selectedEvents);
-                <!--removeData(barChart);-->
                 barChartLabels = prepareBarChartLabels(selectedEvents);
                 barChartData = prepareBarChartData(selectedEvents, barChartLabels);
                 console.log(barChartLabels);
                 console.log(barChartData);
-                <!--updateChart(barChart, barChartLabels, barChartData);-->
                 drawBarChart(barChartLabels, barChartData);
+                pieChartLabels = preparePieChartLabels(selectedEvents);
+                pieChartData = preparePieChartData(selectedEvents, pieChartLabels);
+                drawPieChart(pieChartLabels, pieChartData);
+                stackedBarChartAxisLabels = prepareStackedBarChartAxisLabels(selectedEvents);
+                stackedBarChartColumnLabels = prepareStackedBarChartColumnLabels(selectedEvents);
+                stackedBarChartData = prepareStackedBarChartData(selectedEvents, stackedBarChartAxisLabels, stackedBarChartColumnLabels);
+                drawStackedBarChart(stackedBarChartData);
             }
         })
     });

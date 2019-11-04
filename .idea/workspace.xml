@@ -2,14 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5000a02f-02d6-4be9-8cf6-c608899180c0" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/visual/static/js/app.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/visual/templates/visual/base.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/visual/templates/visual/list.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/visual/templates/visual/player_list.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/visual/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stats.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/stats.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tennis_stats/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/tennis_stats/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/visual/templates/visual/player_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/visual/templates/visual/player_list.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/visual/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/visual/views.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -36,8 +30,8 @@
       <file leaf-file-name="player_list.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/visual/templates/visual/player_list.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1039">
-              <caret line="96" column="8" selection-start-line="96" selection-start-column="8" selection-end-line="96" selection-end-column="8" />
+            <state relative-caret-position="-803">
+              <caret line="307" lean-forward="true" selection-start-line="307" selection-end-line="307" />
             </state>
           </provider>
         </entry>
@@ -45,20 +39,11 @@
       <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/visual/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="294">
-              <caret line="17" selection-start-line="17" selection-end-line="17" />
+            <state relative-caret-position="1239">
+              <caret line="62" selection-start-line="62" selection-end-line="62" />
               <folding>
                 <element signature="e#0#35#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/visual/models.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="231">
-              <caret line="11" column="50" selection-start-line="11" selection-start-column="50" selection-end-line="11" selection-end-column="50" />
             </state>
           </provider>
         </entry>
@@ -111,8 +96,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="253" />
-    <option name="y" value="169" />
+    <option name="x" value="307" />
+    <option name="y" value="216" />
     <option name="width" value="1538" />
     <option name="height" value="1004" />
   </component>
@@ -199,6 +184,14 @@
       <option name="presentableId" value="Default" />
       <updated>1569143730654</updated>
     </task>
+    <task id="LOCAL-00001" summary="bar chart complete">
+      <created>1572348837508</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1572348837508</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TodoView">
@@ -217,13 +210,13 @@
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24970368" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.329591" />
       <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.5049388" side_tool="true" weight="0.3287891" />
+      <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.3287891" />
       <window_info anchor="bottom" id="Python Console" order="7" weight="0.3287891" />
-      <window_info anchor="bottom" id="Run" order="2" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="7" sideWeight="0.49506125" weight="0.3287891" />
-      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -235,25 +228,29 @@
     <layout-to-restore>
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24970368" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.329591" />
-      <window_info anchor="bottom" id="Version Control" order="10" weight="0.3287891" />
       <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Python Console" order="7" weight="0.3287891" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.49506125" visible="true" weight="0.3287891" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5049388" side_tool="true" visible="true" weight="0.3287891" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Version Control" order="10" weight="0.3287891" />
+      <window_info anchor="bottom" id="Message" order="0" />
       <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Python Console" order="7" weight="0.3287891" />
     </layout-to-restore>
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="bar chart complete" />
+    <option name="LAST_COMMIT_MESSAGE" value="bar chart complete" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -599,6 +596,13 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/visual/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="231">
+          <caret line="11" column="50" selection-start-line="11" selection-start-column="50" selection-end-line="11" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/visual/urls.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="84">
@@ -609,17 +613,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/visual/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="231">
-          <caret line="11" column="50" selection-start-line="11" selection-start-column="50" selection-end-line="11" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/visual/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="294">
-          <caret line="17" selection-start-line="17" selection-end-line="17" />
+        <state relative-caret-position="1239">
+          <caret line="62" selection-start-line="62" selection-end-line="62" />
           <folding>
             <element signature="e#0#35#0" expanded="true" />
           </folding>
@@ -628,8 +625,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/visual/templates/visual/player_list.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1039">
-          <caret line="96" column="8" selection-start-line="96" selection-start-column="8" selection-end-line="96" selection-end-column="8" />
+        <state relative-caret-position="-803">
+          <caret line="307" lean-forward="true" selection-start-line="307" selection-end-line="307" />
         </state>
       </provider>
     </entry>

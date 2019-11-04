@@ -10,11 +10,26 @@ def select_player(request):
     request_players = request.GET['lastNames']
     last_names = request_players.split()
     print(last_names)
-    events = Event.objects.filter(player__last_name__in=last_names)
-    print(events)
-    selected_events_json = serializers.serialize('json', events)
-    print(selected_events_json)
-    return JsonResponse(selected_events_json, safe=False)
+    events_qs = Event.objects.filter(player__last_name__in=last_names).select_related('player')
+    print(events_qs)
+
+    events_list = []
+
+    for event in events_qs:
+        events_list.append({
+            'name': event.name,
+            'year': event.year,
+            'ranking_type': event.ranking_type,
+            'setting': event.setting,
+            'court_surface': event.court_surface,
+            'last_name': event.player.last_name
+        })
+
+    print(events_list)
+
+    # selected_events_json = serializers.serialize('json', events_list)
+    # print(selected_events_json)
+    return JsonResponse(events_list, safe=False)
 
 def event_list(request):
     events = Event.objects.all()
@@ -32,10 +47,23 @@ def player_list(request):
 def event_charts(request):
     print("reached charts")
     if request.method == 'GET':
-        events = Event.objects.all()
-        events_json = serializers.serialize('json', events)
-        print(events_json)
-        return JsonResponse(events_json, safe=False)
+        events_qs = Event.objects.all().select_related('player')
+
+        events_list = []
+
+        for event in events_qs:
+            events_list.append({
+                'name': event.name,
+                'year': event.year,
+                'ranking_type': event.ranking_type,
+                'setting': event.setting,
+                'court_surface': event.court_surface,
+                'last_name': event.player.last_name
+            })
+
+        # events_json = serializers.serialize('json', events)
+        # print(events_json)
+        return JsonResponse(events_list, safe=False)
 
 def test_list(request):
     return render(request, 'visual/list.html')
