@@ -1,30 +1,40 @@
 {% extends 'visual/base.html' %}
+{% load static %}
 {% block content %}
 
 <div>
     <h1>Event List</h1>
 </div>
 
-{% for event in events %}
-    <div>
-        <h2>name: {{ event.name }}</h2>
-        <p>year: {{ event.year }}</p>
-        <p>type: {{ event.ranking_type }}</p>
-        <p>setting: {{ event.setting }}</p>
-        <p>surface: {{ event.court_surface }}</p>
-    </div>
-{% endfor %}
-
 <select class="selectpicker" multiple id="playerPickerSelect">
     {% for player in players %}
     <option value="{{ player.first_name }} {{ player.last_name }}" selected>{{ player.first_name }} {{ player.last_name }}</option>
     {% endfor %}
 </select>
-<button type="button" class="btn btn-default" id="playerPickerBtn">Pick players</button>
+
+<select class="selectpicker" multiple id="rankingTypeSelect">
+    <option value="Regular" selected>Regular</option>
+    <option value="Slam" selected>Slam</option>
+</select>
+
+<button type="button" class="btn btn-light" id="dataPickerBtn">Select</button>
+
+<!--{% for event in events %}-->
+    <!--<div>-->
+        <!--<h2>name: {{ event.name }}</h2>-->
+        <!--<p>year: {{ event.year }}</p>-->
+        <!--<p>type: {{ event.ranking_type }}</p>-->
+        <!--<p>setting: {{ event.setting }}</p>-->
+        <!--<p>surface: {{ event.court_surface }}</p>-->
+    <!--</div>-->
+<!--{% endfor %}-->
 
 <div id="myBarChartWrapper"></div>
 <div id="myStackedBarChartWrapper"></div>
+<div id="myStackedAgeWonBarChartWrapper"></div>
 <div id="myPieChartWrapper"></div>
+
+<!--<script src="{% static 'js/app.js' %}"></script>-->
 
 <script>
 $(document).ready(function() {
@@ -99,8 +109,8 @@ promise.then(function(result) {
 
         chartCanvas = document.createElement("canvas");
         chartCanvas.setAttribute("id","myBarChart");
-        chartCanvas.setAttribute("width","100");
-        chartCanvas.setAttribute("height","100");
+        chartCanvas.setAttribute("width","500");
+        chartCanvas.setAttribute("height","500");
         document.getElementById('myBarChartWrapper').appendChild(chartCanvas);
 
         var bar_ctx = document.getElementById('myBarChart');
@@ -129,6 +139,7 @@ promise.then(function(result) {
                 }]
             },
             options: {
+                maintainAspectRatio: false,
                 scales: {
                     yAxes: [{
                         ticks: {
@@ -187,8 +198,8 @@ promise.then(function(result) {
 
         chartCanvas = document.createElement("canvas");
         chartCanvas.setAttribute("id","myPieChart");
-        chartCanvas.setAttribute("width","100");
-        chartCanvas.setAttribute("height","100");
+        chartCanvas.setAttribute("width","500");
+        chartCanvas.setAttribute("height","500");
         document.getElementById('myPieChartWrapper').appendChild(chartCanvas);
 
         var pie_ctx = document.getElementById('myPieChart');
@@ -212,6 +223,9 @@ promise.then(function(result) {
                     ],
                     borderWidth: 1
                 }]
+            },
+            options: {
+                maintainAspectRatio: false,
             }
         });
     }
@@ -268,8 +282,8 @@ promise.then(function(result) {
             console.log(stackedBarChartColumnLabels[i]);
 
             for (var j = 0; j < events.length; j++) {
-                var eventCount = numEventsMap.get(events[j].year);
                 if (events[j].last_name ===  stackedBarChartColumnLabels[i]) {
+                    var eventCount = numEventsMap.get(events[j].year);
                     eventCount++;
                     numEventsMap.set(events[j].year, eventCount);
                 }
@@ -313,8 +327,8 @@ promise.then(function(result) {
 
         chartCanvas = document.createElement("canvas");
         chartCanvas.setAttribute("id","myStackedBarChart");
-        chartCanvas.setAttribute("width","100");
-        chartCanvas.setAttribute("height","100");
+        chartCanvas.setAttribute("width","500");
+        chartCanvas.setAttribute("height","500");
         document.getElementById('myStackedBarChartWrapper').appendChild(chartCanvas);
 
         var bar_ctx = document.getElementById('myStackedBarChart');
@@ -331,6 +345,123 @@ promise.then(function(result) {
 					intersect: false
 				},
 				responsive: true,
+				maintainAspectRatio: false,
+				scales: {
+					xAxes: [{
+						stacked: true,
+					}],
+					yAxes: [{
+						stacked: true
+					}]
+				}
+			}
+		});
+	};
+
+	function prepareStackedAgeWonBarChartAxisLabels(events) {
+
+        console.log(events.length);
+
+        var yearsSet = new Set();
+
+        for (var i = 0; i < events.length; i++) {
+            yearOfBirth = events[i].date_of_birth.split("-")[0]
+            ageWon = events[i].year - yearOfBirth
+            yearsSet.add(ageWon);
+        }
+
+        var yearsArray = Array.from(yearsSet);
+        yearsArray.sort();
+        console.log("stack age won years array");
+        console.log(yearsArray);
+        return yearsArray;
+    }
+
+    function prepareStackedAgeWonBarChartData(events, stackedAgeWonBarChartAxisLabels, stackedBarChartColumnLabels) {
+
+        numEventsData = [];
+        console.log("players in stacked data");
+        console.log(stackedBarChartColumnLabels.length);
+
+        for (var i = 0; i < stackedBarChartColumnLabels.length; i++) {
+
+            console.log(stackedBarChartColumnLabels[i]);
+            var numEventsMap = new Map();
+
+            for (var j = 0; j < stackedAgeWonBarChartAxisLabels.length; j++) {
+                numEventsMap.set(stackedAgeWonBarChartAxisLabels[j], 0);
+            }
+
+            console.log(stackedBarChartColumnLabels[i]);
+            console.log(numEventsMap);
+
+            for (var j = 0; j < events.length; j++) {
+                if (events[j].last_name ===  stackedBarChartColumnLabels[i]) {
+                    yearOfBirth = events[j].date_of_birth.split("-")[0]
+                    ageWon = events[j].year - yearOfBirth
+                    var eventCount = numEventsMap.get(ageWon);
+                    eventCount++;
+                    numEventsMap.set(ageWon, eventCount);
+                }
+            }
+            console.log(stackedBarChartColumnLabels[i]);
+            console.log(numEventsMap);
+
+            var numEventsArray = [];
+
+            for (var j = 0; j < stackedAgeWonBarChartAxisLabels.length; j++) {
+                var eventCount = numEventsMap.get(stackedAgeWonBarChartAxisLabels[j]);
+                numEventsArray.push(eventCount);
+            }
+            numEventsData.push(numEventsArray);
+        }
+
+        backgroundColorArray = ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)'];
+
+        var stackedAgeWonBarChartData = {};
+        stackedAgeWonBarChartData.labels = stackedAgeWonBarChartAxisLabels;
+        var playerDatasets = [];
+
+        for (var i = 0; i < stackedBarChartColumnLabels.length; i++) {
+            var playerDataset = {};
+            playerDataset.label = stackedBarChartColumnLabels[i];
+            playerDataset.backgroundColor = backgroundColorArray[i];
+            playerDataset.data = numEventsData[i];
+            playerDatasets.push(playerDataset);
+        }
+        stackedAgeWonBarChartData.datasets = playerDatasets;
+        console.log(stackedBarChartData);
+        return stackedAgeWonBarChartData;
+    }
+
+    function drawStackedAgeWonBarChart(stackedAgeWonBarChartData) {
+
+        if (document.getElementById('myStackedAgeWonBarChart')) {
+            var chartCanvas = document.getElementById('myStackedAgeWonBarChart');
+            chartCanvas.parentNode.removeChild(chartCanvas);
+        }
+
+        chartCanvas = document.createElement("canvas");
+        chartCanvas.setAttribute("id","myStackedAgeWonBarChart");
+        chartCanvas.setAttribute("width","500");
+        chartCanvas.setAttribute("height","500");
+        document.getElementById('myStackedAgeWonBarChartWrapper').appendChild(chartCanvas);
+
+        var bar_ctx = document.getElementById('myStackedAgeWonBarChart');
+        barChart = new Chart(bar_ctx, {
+            type: 'bar',
+            data: stackedAgeWonBarChartData,
+            options: {
+			    title: {
+					display: true,
+					text: 'Chart.js Bar Chart - Stacked'
+				},
+				tooltips: {
+					mode: 'index',
+					intersect: false
+				},
+				responsive: true,
+				maintainAspectRatio: false,
 				scales: {
 					xAxes: [{
 						stacked: true,
@@ -359,28 +490,44 @@ promise.then(function(result) {
     console.log(stackedBarChartData);
     drawStackedBarChart(stackedBarChartData);
 
-    $("#playerPickerBtn").on( "click", function() {
-        console.log("player picker");
+    stackedAgeWonBarChartAxisLabels = prepareStackedAgeWonBarChartAxisLabels(events);
+    console.log(stackedAgeWonBarChartAxisLabels);
+    <!--stackedBarChartColumnLabels = prepareStackedBarChartColumnLabels(events);-->
+    <!--console.log(stackedBarChartColumnLabels);-->
+    stackedAgeWonBarChartData = prepareStackedAgeWonBarChartData(events, stackedAgeWonBarChartAxisLabels, stackedBarChartColumnLabels);
+    console.log(stackedAgeWonBarChartData);
+    drawStackedAgeWonBarChart(stackedAgeWonBarChartData);
+
+    $("#dataPickerBtn").on( "click", function() {
+        console.log("data picker");
         var players = $("#playerPickerSelect").val();
         var playersArray = players.toString().split(",");
         console.log("players picked " + playersArray);
-        var playersLastNameArray = [];
+        <!--var playersLastNameArray = [];-->
         var playersLastNameStr = "";
         for (var i = 0; i < playersArray.length; i++) {
-            playersLastNameArray.push(playersArray[i].split(" ")[1]);
+            <!--playersLastNameArray.push(playersArray[i].split(" ")[1]);-->
             playersLastNameStr = playersLastNameStr + " " + playersArray[i].split(" ")[1];
         }
         playersLastNameStr = playersLastNameStr.trim();
-        console.log(playersLastNameArray);
+        <!--console.log(playersLastNameArray);-->
         console.log(playersLastNameStr);
+        var rankingTypes = $("#rankingTypeSelect").val();
+        console.log(rankingTypes);
+        var rankingTypesStr = "";
+        for (var i = 0; i < rankingTypes.length; i++) {
+            rankingTypesStr = rankingTypesStr + " " + rankingTypes[i];
+        }
+        console.log(rankingTypesStr);
 
         $.ajax({
             type: "GET",
             url: "select_player",
-            data: {lastNames: playersLastNameStr},
+            data: {lastNames: playersLastNameStr, rankingTypes: rankingTypesStr},
             success: function(selected_events_json){
                 selectedEvents = selected_events_json;
                 console.log(selectedEvents);
+
                 barChartLabels = prepareBarChartLabels(selectedEvents);
                 barChartData = prepareBarChartData(selectedEvents, barChartLabels);
                 console.log(barChartLabels);
@@ -393,6 +540,82 @@ promise.then(function(result) {
                 stackedBarChartColumnLabels = prepareStackedBarChartColumnLabels(selectedEvents);
                 stackedBarChartData = prepareStackedBarChartData(selectedEvents, stackedBarChartAxisLabels, stackedBarChartColumnLabels);
                 drawStackedBarChart(stackedBarChartData);
+                stackedAgeWonBarChartAxisLabels = prepareStackedAgeWonBarChartAxisLabels(selectedEvents);
+                stackedBarChartColumnLabels = prepareStackedBarChartColumnLabels(selectedEvents);
+                stackedAgeWonBarChartData = prepareStackedAgeWonBarChartData(selectedEvents, stackedAgeWonBarChartAxisLabels, stackedBarChartColumnLabels);
+                drawStackedAgeWonBarChart(stackedAgeWonBarChartData);
+
+                var eventTable = document.createElement("table");
+                eventTable.id = "event_details";
+                eventTable.classList.add("table");
+                document.body.appendChild(eventTable);
+                var tableHeadingRow = document.createElement("tr");
+                tableHeadingRow.id = "table_heading_row"
+                tableHeadingRow.classList.add("thead-dark");
+                document.getElementById("event_details").appendChild(tableHeadingRow);
+                var tableHeading = document.createElement("th");
+                tableHeading.innerText = "Player";
+                document.getElementById("table_heading_row").appendChild(tableHeading);
+                var tableHeading = document.createElement("th");
+                tableHeading.innerText = "Event";
+                document.getElementById("table_heading_row").appendChild(tableHeading);
+                var tableHeading = document.createElement("th");
+                tableHeading.innerText = "Year";
+                document.getElementById("table_heading_row").appendChild(tableHeading);
+                var tableHeading = document.createElement("th");
+                tableHeading.innerText = "Type";
+                document.getElementById("table_heading_row").appendChild(tableHeading);
+                var tableHeading = document.createElement("th");
+                tableHeading.innerText = "Surface";
+                document.getElementById("table_heading_row").appendChild(tableHeading);
+                var tableHeading = document.createElement("th");
+                tableHeading.innerText = "Setting";
+                document.getElementById("table_heading_row").appendChild(tableHeading);
+                players = stackedBarChartColumnLabels;
+                for (var i = 0; i < players.length; i++) {
+                    var playerRow = document.createElement("tr");
+                    playerRow.id = "player_row";
+                    playerRow.classList.add("header", "table-info");
+                    var playerRowCell = document.createElement("td")
+                    playerRowCell.colSpan = 6;
+                    var playerRowCellText = document.createTextNode(players[i]);
+                    playerRowCell.appendChild(playerRowCellText);
+                    playerRow.appendChild(playerRowCell);
+                    document.getElementById("event_details").appendChild(playerRow);
+                    for (var j = 0; j < selectedEvents.length; j++) {
+                        if (selectedEvents[j].last_name === players[i]) {
+                            var eventRow = document.createElement("tr");
+                            var eventRowCell = document.createElement("td")
+                            var eventRowCellText = document.createTextNode("");
+                            eventRowCell.appendChild(eventRowCellText);
+                            eventRow.appendChild(eventRowCell);
+                            var eventRowCell = document.createElement("td")
+                            var eventRowCellText = document.createTextNode(selectedEvents[j].name);
+                            eventRowCell.appendChild(eventRowCellText);
+                            eventRow.appendChild(eventRowCell);
+                            var eventRowCell = document.createElement("td")
+                            var eventRowCellText = document.createTextNode(selectedEvents[j].year);
+                            eventRowCell.appendChild(eventRowCellText);
+                            eventRow.appendChild(eventRowCell);
+                            var eventRowCell = document.createElement("td")
+                            var eventRowCellText = document.createTextNode(selectedEvents[j].ranking_type);
+                            eventRowCell.appendChild(eventRowCellText);
+                            eventRow.appendChild(eventRowCell);
+                            var eventRowCell = document.createElement("td")
+                            var eventRowCellText = document.createTextNode(selectedEvents[j].court_surface);
+                            eventRowCell.appendChild(eventRowCellText);
+                            eventRow.appendChild(eventRowCell);
+                            var eventRowCell = document.createElement("td")
+                            var eventRowCellText = document.createTextNode(selectedEvents[j].setting);
+                            eventRowCell.appendChild(eventRowCellText);
+                            eventRow.appendChild(eventRowCell);
+                            document.getElementById("event_details").appendChild(eventRow);
+                        }
+                    }
+                }
+                $('.header').click(function(){
+                    $(this).nextUntil('tr.header').slideToggle(1000);
+                });
             }
         })
     });
@@ -400,7 +623,7 @@ promise.then(function(result) {
 
 </script>
 
-<button type="button" id="player_details_btn">Display player details</button>
+<button type="button" class="btn btn-light" id="player_details_btn">Display player details</button>
 
 <script>
     $('#player_details_btn').click(function(){

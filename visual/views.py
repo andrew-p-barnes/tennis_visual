@@ -10,7 +10,10 @@ def select_player(request):
     request_players = request.GET['lastNames']
     last_names = request_players.split()
     print(last_names)
-    events_qs = Event.objects.filter(player__last_name__in=last_names).select_related('player')
+    request_ranking_types = request.GET['rankingTypes']
+    ranking_types = request_ranking_types.split()
+    print(ranking_types)
+    events_qs = Event.objects.filter(player__last_name__in=last_names).filter(ranking_type__in=ranking_types).select_related('player')
     print(events_qs)
 
     events_list = []
@@ -22,7 +25,8 @@ def select_player(request):
             'ranking_type': event.ranking_type,
             'setting': event.setting,
             'court_surface': event.court_surface,
-            'last_name': event.player.last_name
+            'last_name': event.player.last_name,
+            'date_of_birth': event.player.date_of_birth
         })
 
     print(events_list)
@@ -58,7 +62,8 @@ def event_charts(request):
                 'ranking_type': event.ranking_type,
                 'setting': event.setting,
                 'court_surface': event.court_surface,
-                'last_name': event.player.last_name
+                'last_name': event.player.last_name,
+                'date_of_birth': event.player.date_of_birth
             })
 
         # events_json = serializers.serialize('json', events)
