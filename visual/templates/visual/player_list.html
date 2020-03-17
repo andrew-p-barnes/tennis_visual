@@ -3,22 +3,22 @@
 {% block content %}
 
 <div>
-    <h1>Event List</h1>
+    <br>
+    <h2>Charts</h2>
+    <br>
+    <select class="selectpicker" multiple id="playerPickerSelect">
+        {% for player in players %}
+        <option value="{{ player.first_name }} {{ player.last_name }}" selected>{{ player.first_name }} {{ player.last_name }}</option>
+        {% endfor %}
+    </select>
+
+    <select class="selectpicker" multiple id="rankingTypeSelect">
+        <option value="Regular" selected>Regular</option>
+        <option value="Slam" selected>Slam</option>
+    </select>
+
+    <button type="button" class="btn btn-light" id="dataPickerBtn">Select</button>
 </div>
-
-<select class="selectpicker" multiple id="playerPickerSelect">
-    {% for player in players %}
-    <option value="{{ player.first_name }} {{ player.last_name }}" selected>{{ player.first_name }} {{ player.last_name }}</option>
-    {% endfor %}
-</select>
-
-<select class="selectpicker" multiple id="rankingTypeSelect">
-    <option value="Regular" selected>Regular</option>
-    <option value="Slam" selected>Slam</option>
-</select>
-
-<button type="button" class="btn btn-light" id="dataPickerBtn">Select</button>
-
 <!--{% for event in events %}-->
     <!--<div>-->
         <!--<h2>name: {{ event.name }}</h2>-->
@@ -29,11 +29,14 @@
     <!--</div>-->
 <!--{% endfor %}-->
 
-<div id="myBarChartWrapper"></div>
+<!--<div id="myBarChartWrapper"></div>-->
 <div id="myStackedBarChartWrapper"></div>
 <div id="myStackedAgeWonBarChartWrapper"></div>
 <div id="myPieChartWrapper"></div>
-
+<br>
+<h2>Data</h2>
+<br>
+<div id="eventDetailsWrapper"></div>
 <!--<script src="{% static 'js/app.js' %}"></script>-->
 
 <script>
@@ -60,96 +63,96 @@ let promise = new Promise(function(resolve, reject) {
 
 promise.then(function(result) {
 
-    function prepareBarChartLabels(events) {
+    <!--function prepareBarChartLabels(events) {-->
 
-        console.log(events.length);
+        <!--console.log(events.length);-->
 
-        var yearsSet = new Set();
+        <!--var yearsSet = new Set();-->
 
-        for (var i = 0; i < events.length; i++) {
-            yearsSet.add(events[i].year);
-        }
+        <!--for (var i = 0; i < events.length; i++) {-->
+            <!--yearsSet.add(events[i].year);-->
+        <!--}-->
 
-        var yearsArray = Array.from(yearsSet);
-        yearsArray.sort();
-        return yearsArray;
-    }
+        <!--var yearsArray = Array.from(yearsSet);-->
+        <!--yearsArray.sort();-->
+        <!--return yearsArray;-->
+    <!--}-->
 
-    function prepareBarChartData(events, barChartLabels) {
+    <!--function prepareBarChartData(events, barChartLabels) {-->
 
-        var numEventsMap = new Map();
+        <!--var numEventsMap = new Map();-->
 
-        for (var i = 0; i < barChartLabels.length; i++) {
-            numEventsMap.set(barChartLabels[i], 0);
-        }
+        <!--for (var i = 0; i < barChartLabels.length; i++) {-->
+            <!--numEventsMap.set(barChartLabels[i], 0);-->
+        <!--}-->
 
-        for (var i = 0; i < events.length; i++) {
-            var eventCount = numEventsMap.get(events[i].year);
-            eventCount++;
-            numEventsMap.set(events[i].year, eventCount);
-        }
+        <!--for (var i = 0; i < events.length; i++) {-->
+            <!--var eventCount = numEventsMap.get(events[i].year);-->
+            <!--eventCount++;-->
+            <!--numEventsMap.set(events[i].year, eventCount);-->
+        <!--}-->
 
-        console.log(numEventsMap);
+        <!--console.log(numEventsMap);-->
 
-        var numEventsArray = [];
+        <!--var numEventsArray = [];-->
 
-        for (var i = 0; i < barChartLabels.length; i++) {
-            var eventCount = numEventsMap.get(barChartLabels[i]);
-            numEventsArray.push(eventCount);
-        }
-        return numEventsArray;
-    }
+        <!--for (var i = 0; i < barChartLabels.length; i++) {-->
+            <!--var eventCount = numEventsMap.get(barChartLabels[i]);-->
+            <!--numEventsArray.push(eventCount);-->
+        <!--}-->
+        <!--return numEventsArray;-->
+    <!--}-->
 
-    function drawBarChart(barChartLabels, barChartData) {
+    <!--function drawBarChart(barChartLabels, barChartData) {-->
 
-        if (document.getElementById('myBarChart')) {
-            var chartCanvas = document.getElementById('myBarChart');
-            chartCanvas.parentNode.removeChild(chartCanvas);
-        }
+        <!--if (document.getElementById('myBarChart')) {-->
+            <!--var chartCanvas = document.getElementById('myBarChart');-->
+            <!--chartCanvas.parentNode.removeChild(chartCanvas);-->
+        <!--}-->
 
-        chartCanvas = document.createElement("canvas");
-        chartCanvas.setAttribute("id","myBarChart");
-        chartCanvas.setAttribute("width","500");
-        chartCanvas.setAttribute("height","500");
-        document.getElementById('myBarChartWrapper').appendChild(chartCanvas);
+        <!--chartCanvas = document.createElement("canvas");-->
+        <!--chartCanvas.setAttribute("id","myBarChart");-->
+        <!--chartCanvas.setAttribute("width","500");-->
+        <!--chartCanvas.setAttribute("height","500");-->
+        <!--document.getElementById('myBarChartWrapper').appendChild(chartCanvas);-->
 
-        var bar_ctx = document.getElementById('myBarChart');
-        barChart = new Chart(bar_ctx, {
-            type: 'bar',
-            data: {
-                labels: barChartLabels,
-                datasets: [{
-                    label: '# of Events',
-                    data: barChartData,
-                    backgroundColor: [
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)',
-                        'rgba(5, 9, 64, 0.2)',
-                        'rgba(55, 15, 64, 0.2)',
-                        'rgba(205, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)',
-                        'rgba(5, 9, 64, 0.2)',
-                        'rgba(55, 15, 64, 0.2)',
-                        'rgba(205, 159, 64, 0.2)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                maintainAspectRatio: false,
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
-                }
-            }
-        });
-    }
+        <!--var bar_ctx = document.getElementById('myBarChart');-->
+        <!--barChart = new Chart(bar_ctx, {-->
+            <!--type: 'bar',-->
+            <!--data: {-->
+                <!--labels: barChartLabels,-->
+                <!--datasets: [{-->
+                    <!--label: '# of Events',-->
+                    <!--data: barChartData,-->
+                    <!--backgroundColor: [-->
+                        <!--'rgba(153, 102, 255, 0.2)',-->
+                        <!--'rgba(255, 159, 64, 0.2)',-->
+                        <!--'rgba(5, 9, 64, 0.2)',-->
+                        <!--'rgba(55, 15, 64, 0.2)',-->
+                        <!--'rgba(205, 159, 64, 0.2)'-->
+                    <!--],-->
+                    <!--borderColor: [-->
+                        <!--'rgba(153, 102, 255, 1)',-->
+                        <!--'rgba(255, 159, 64, 1)',-->
+                        <!--'rgba(5, 9, 64, 0.2)',-->
+                        <!--'rgba(55, 15, 64, 0.2)',-->
+                        <!--'rgba(205, 159, 64, 0.2)'-->
+                    <!--],-->
+                    <!--borderWidth: 1-->
+                <!--}]-->
+            <!--},-->
+            <!--options: {-->
+                <!--maintainAspectRatio: false,-->
+                <!--scales: {-->
+                    <!--yAxes: [{-->
+                        <!--ticks: {-->
+                            <!--beginAtZero: true-->
+                        <!--}-->
+                    <!--}]-->
+                <!--}-->
+            <!--}-->
+        <!--});-->
+    <!--}-->
 
     function preparePieChartLabels(events) {
 
@@ -162,6 +165,23 @@ promise.then(function(result) {
         var surfacesArray = Array.from(surfacesSet);
         surfacesArray.sort();
         return surfacesArray;
+    }
+
+    function getPieChartBackgroundColours(pieChartLabels) {
+
+        var backgroundColoursMap = new Map();
+        var backgroundColoursArray = [];
+
+        backgroundColoursMap.set("Carpet","rgba(128, 0, 0, 0.2)");
+        backgroundColoursMap.set("Clay","rgba(232, 126, 4, 0.2)");
+        backgroundColoursMap.set("Grass","rgba(135, 211, 124, 0.2)");
+        backgroundColoursMap.set("Hard","rgba(89, 171, 227, 0.2)");
+
+        for (var i = 0; i < pieChartLabels.length; i++) {
+            var backgroundColour = backgroundColoursMap.get(pieChartLabels[i]);
+            backgroundColoursArray.push(backgroundColour);
+        }
+        return backgroundColoursArray;
     }
 
     function preparePieChartData(events, pieChartLabels) {
@@ -189,7 +209,7 @@ promise.then(function(result) {
         return numEventsArray;
     }
 
-    function drawPieChart(pieChartLabels, pieChartData) {
+    function drawPieChart(pieChartLabels, backgroundColours, pieChartData) {
 
         if (document.getElementById('myPieChart')) {
             var chartCanvas = document.getElementById('myPieChart');
@@ -202,6 +222,14 @@ promise.then(function(result) {
         chartCanvas.setAttribute("height","500");
         document.getElementById('myPieChartWrapper').appendChild(chartCanvas);
 
+        var borderColoursArray = [];
+
+        for (var i = 0; i < backgroundColours.length; i++) {
+            var borderColour;
+            borderColour = backgroundColours[i].replace("0.2","1");
+            borderColoursArray.push(borderColour);
+        }
+
         var pie_ctx = document.getElementById('myPieChart');
         var pieChart = new Chart(pie_ctx, {
             type: 'pie',
@@ -209,23 +237,29 @@ promise.then(function(result) {
                 labels: pieChartLabels,
                 datasets: [{
                     data: pieChartData,
-                    backgroundColor: [
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(53, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)',
-                        'rgba(200, 19, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(53, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)',
-                        'rgba(200, 19, 64, 0.2)'
-                    ],
+                    backgroundColor: backgroundColours,
+                    <!--[-->
+                        <!--'rgba(153, 102, 255, 0.2)',-->
+                        <!--'rgba(53, 102, 255, 0.2)',-->
+                        <!--'rgba(255, 159, 64, 0.2)',-->
+                        <!--'rgba(200, 19, 64, 0.2)'-->
+                    <!--],-->
+                    borderColor: borderColoursArray,
+                    <!--[-->
+                        <!--'rgba(153, 102, 255, 1)',-->
+                        <!--'rgba(53, 102, 255, 1)',-->
+                        <!--'rgba(255, 159, 64, 1)',-->
+                        <!--'rgba(200, 19, 64, 1)'-->
+                    <!--],-->
                     borderWidth: 1
                 }]
             },
             options: {
                 maintainAspectRatio: false,
+                title: {
+					display: true,
+					text: 'Pie Chart - Tournament wins by surface type'
+				},
             }
         });
     }
@@ -338,7 +372,7 @@ promise.then(function(result) {
             options: {
 			    title: {
 					display: true,
-					text: 'Chart.js Bar Chart - Stacked'
+					text: 'Stacked Bar Chart - Tournament wins by player (tournament year)'
 				},
 				tooltips: {
 					mode: 'index',
@@ -349,9 +383,17 @@ promise.then(function(result) {
 				scales: {
 					xAxes: [{
 						stacked: true,
+						scaleLabel: {
+						    display: true,
+						    labelString: 'Year'
+						}
 					}],
 					yAxes: [{
-						stacked: true
+						stacked: true,
+						scaleLabel: {
+						    display: true,
+						    labelString: 'Wins'
+						}
 					}]
 				}
 			}
@@ -454,7 +496,7 @@ promise.then(function(result) {
             options: {
 			    title: {
 					display: true,
-					text: 'Chart.js Bar Chart - Stacked'
+					text: 'Stacked Bar Chart - Tournament wins by player (player age when won)'
 				},
 				tooltips: {
 					mode: 'index',
@@ -465,22 +507,120 @@ promise.then(function(result) {
 				scales: {
 					xAxes: [{
 						stacked: true,
+						scaleLabel: {
+						    display: true,
+						    labelString: 'Age'
+						}
 					}],
 					yAxes: [{
-						stacked: true
+						stacked: true,
+						scaleLabel: {
+						    display: true,
+						    labelString: 'Wins'
+						}
 					}]
 				}
 			}
 		});
 	};
 
-    barChartLabels = prepareBarChartLabels(events);
-    barChartData = prepareBarChartData(events, barChartLabels);
-    drawBarChart(barChartLabels, barChartData);
+	function createEventTable(stackedBarChartColumnLabels, selectedEvents) {
+
+        if (document.getElementById('eventDetails')) {
+            var eventTable = document.getElementById('eventDetails');
+            eventTable.parentNode.removeChild(eventTable);
+        }
+        var eventTable = document.createElement("table");
+        eventTable.id = "eventDetails";
+        eventTable.classList.add("table");
+        document.getElementById("eventDetailsWrapper").appendChild(eventTable);
+        var tableHeadingRow = document.createElement("tr");
+        tableHeadingRow.id = "tableHeadingRow"
+        tableHeadingRow.classList.add("thead-dark");
+        document.getElementById("eventDetails").appendChild(tableHeadingRow);
+        var tableHeading = document.createElement("th");
+        tableHeading.innerText = "Player";
+        document.getElementById("tableHeadingRow").appendChild(tableHeading);
+        var tableHeading = document.createElement("th");
+        tableHeading.innerText = "Event";
+        document.getElementById("tableHeadingRow").appendChild(tableHeading);
+        var tableHeading = document.createElement("th");
+        tableHeading.innerText = "Year";
+        document.getElementById("tableHeadingRow").appendChild(tableHeading);
+        var tableHeading = document.createElement("th");
+        tableHeading.innerText = "Type";
+        document.getElementById("tableHeadingRow").appendChild(tableHeading);
+        var tableHeading = document.createElement("th");
+        tableHeading.innerText = "Surface";
+        document.getElementById("tableHeadingRow").appendChild(tableHeading);
+        var tableHeading = document.createElement("th");
+        tableHeading.innerText = "Setting";
+        document.getElementById("tableHeadingRow").appendChild(tableHeading);
+        players = stackedBarChartColumnLabels;
+        for (var i = 0; i < players.length; i++) {
+            var playerRow = document.createElement("tr");
+            playerRow.classList.add("table-info");
+            var playerRowCell = document.createElement("td")
+            playerRowCell.colSpan = 6;
+            var playerRowCellText = document.createTextNode(players[i] + " (click to hide)");
+            playerRowCell.appendChild(playerRowCellText);
+            playerRow.appendChild(playerRowCell);
+            document.getElementById("eventDetails").appendChild(playerRow);
+            for (var j = 0; j < selectedEvents.length; j++) {
+                if (selectedEvents[j].last_name === players[i]) {
+                    var eventRow = document.createElement("tr");
+                    var eventRowCell = document.createElement("td")
+                    var eventRowCellText = document.createTextNode("");
+                    eventRowCell.appendChild(eventRowCellText);
+                    eventRow.appendChild(eventRowCell);
+                    var eventRowCell = document.createElement("td")
+                    var eventRowCellText = document.createTextNode(selectedEvents[j].name);
+                    eventRowCell.appendChild(eventRowCellText);
+                    eventRow.appendChild(eventRowCell);
+                    var eventRowCell = document.createElement("td")
+                    var eventRowCellText = document.createTextNode(selectedEvents[j].year);
+                    eventRowCell.appendChild(eventRowCellText);
+                    eventRow.appendChild(eventRowCell);
+                    var eventRowCell = document.createElement("td")
+                    var eventRowCellText = document.createTextNode(selectedEvents[j].ranking_type);
+                    eventRowCell.appendChild(eventRowCellText);
+                    eventRow.appendChild(eventRowCell);
+                    var eventRowCell = document.createElement("td")
+                    var eventRowCellText = document.createTextNode(selectedEvents[j].court_surface);
+                    eventRowCell.appendChild(eventRowCellText);
+                    eventRow.appendChild(eventRowCell);
+                    var eventRowCell = document.createElement("td")
+                    var eventRowCellText = document.createTextNode(selectedEvents[j].setting);
+                    eventRowCell.appendChild(eventRowCellText);
+                    eventRow.appendChild(eventRowCell);
+                    document.getElementById("eventDetails").appendChild(eventRow);
+                }
+            }
+        }
+        $(document).ready(function(){
+            feather.replace();
+        });
+
+        $('.table-info').click(function(){
+            var tableRowCellText = $(this).children().text();
+            if (tableRowCellText.includes("hide")) {
+                tableRowCellText = tableRowCellText.replace("hide","show");
+            } else {
+                tableRowCellText = tableRowCellText.replace("show","hide");
+            }
+            $(this).children().text(tableRowCellText);
+            $(this).nextUntil('tr.table-info').slideToggle(400);
+        });
+    }
+
+    <!--barChartLabels = prepareBarChartLabels(events);-->
+    <!--barChartData = prepareBarChartData(events, barChartLabels);-->
+    <!--drawBarChart(barChartLabels, barChartData);-->
 
     pieChartLabels = preparePieChartLabels(events);
+    pieChartBackgroundColours = getPieChartBackgroundColours(pieChartLabels);
     pieChartData = preparePieChartData(events, pieChartLabels);
-    drawPieChart(pieChartLabels, pieChartData);
+    drawPieChart(pieChartLabels, pieChartBackgroundColours, pieChartData);
 
     stackedBarChartAxisLabels = prepareStackedBarChartAxisLabels(events);
     console.log(stackedBarChartAxisLabels);
@@ -492,11 +632,13 @@ promise.then(function(result) {
 
     stackedAgeWonBarChartAxisLabels = prepareStackedAgeWonBarChartAxisLabels(events);
     console.log(stackedAgeWonBarChartAxisLabels);
-    <!--stackedBarChartColumnLabels = prepareStackedBarChartColumnLabels(events);-->
-    <!--console.log(stackedBarChartColumnLabels);-->
     stackedAgeWonBarChartData = prepareStackedAgeWonBarChartData(events, stackedAgeWonBarChartAxisLabels, stackedBarChartColumnLabels);
     console.log(stackedAgeWonBarChartData);
     drawStackedAgeWonBarChart(stackedAgeWonBarChartData);
+
+    createEventTable(stackedBarChartColumnLabels, events);
+
+
 
     $("#dataPickerBtn").on( "click", function() {
         console.log("data picker");
@@ -528,14 +670,16 @@ promise.then(function(result) {
                 selectedEvents = selected_events_json;
                 console.log(selectedEvents);
 
-                barChartLabels = prepareBarChartLabels(selectedEvents);
-                barChartData = prepareBarChartData(selectedEvents, barChartLabels);
-                console.log(barChartLabels);
-                console.log(barChartData);
-                drawBarChart(barChartLabels, barChartData);
+                <!--barChartLabels = prepareBarChartLabels(selectedEvents);-->
+                <!--barChartData = prepareBarChartData(selectedEvents, barChartLabels);-->
+                <!--console.log(barChartLabels);-->
+                <!--console.log(barChartData);-->
+                <!--drawBarChart(barChartLabels, barChartData);-->
+
                 pieChartLabels = preparePieChartLabels(selectedEvents);
+                pieChartBackgroundColours = getPieChartBackgroundColours(pieChartLabels);
                 pieChartData = preparePieChartData(selectedEvents, pieChartLabels);
-                drawPieChart(pieChartLabels, pieChartData);
+                drawPieChart(pieChartLabels, pieChartBackgroundColours, pieChartData);
                 stackedBarChartAxisLabels = prepareStackedBarChartAxisLabels(selectedEvents);
                 stackedBarChartColumnLabels = prepareStackedBarChartColumnLabels(selectedEvents);
                 stackedBarChartData = prepareStackedBarChartData(selectedEvents, stackedBarChartAxisLabels, stackedBarChartColumnLabels);
@@ -544,80 +688,9 @@ promise.then(function(result) {
                 stackedBarChartColumnLabels = prepareStackedBarChartColumnLabels(selectedEvents);
                 stackedAgeWonBarChartData = prepareStackedAgeWonBarChartData(selectedEvents, stackedAgeWonBarChartAxisLabels, stackedBarChartColumnLabels);
                 drawStackedAgeWonBarChart(stackedAgeWonBarChartData);
-
-                var eventTable = document.createElement("table");
-                eventTable.id = "event_details";
-                eventTable.classList.add("table");
-                document.body.appendChild(eventTable);
-                var tableHeadingRow = document.createElement("tr");
-                tableHeadingRow.id = "table_heading_row"
-                tableHeadingRow.classList.add("thead-dark");
-                document.getElementById("event_details").appendChild(tableHeadingRow);
-                var tableHeading = document.createElement("th");
-                tableHeading.innerText = "Player";
-                document.getElementById("table_heading_row").appendChild(tableHeading);
-                var tableHeading = document.createElement("th");
-                tableHeading.innerText = "Event";
-                document.getElementById("table_heading_row").appendChild(tableHeading);
-                var tableHeading = document.createElement("th");
-                tableHeading.innerText = "Year";
-                document.getElementById("table_heading_row").appendChild(tableHeading);
-                var tableHeading = document.createElement("th");
-                tableHeading.innerText = "Type";
-                document.getElementById("table_heading_row").appendChild(tableHeading);
-                var tableHeading = document.createElement("th");
-                tableHeading.innerText = "Surface";
-                document.getElementById("table_heading_row").appendChild(tableHeading);
-                var tableHeading = document.createElement("th");
-                tableHeading.innerText = "Setting";
-                document.getElementById("table_heading_row").appendChild(tableHeading);
-                players = stackedBarChartColumnLabels;
-                for (var i = 0; i < players.length; i++) {
-                    var playerRow = document.createElement("tr");
-                    playerRow.id = "player_row";
-                    playerRow.classList.add("header", "table-info");
-                    var playerRowCell = document.createElement("td")
-                    playerRowCell.colSpan = 6;
-                    var playerRowCellText = document.createTextNode(players[i]);
-                    playerRowCell.appendChild(playerRowCellText);
-                    playerRow.appendChild(playerRowCell);
-                    document.getElementById("event_details").appendChild(playerRow);
-                    for (var j = 0; j < selectedEvents.length; j++) {
-                        if (selectedEvents[j].last_name === players[i]) {
-                            var eventRow = document.createElement("tr");
-                            var eventRowCell = document.createElement("td")
-                            var eventRowCellText = document.createTextNode("");
-                            eventRowCell.appendChild(eventRowCellText);
-                            eventRow.appendChild(eventRowCell);
-                            var eventRowCell = document.createElement("td")
-                            var eventRowCellText = document.createTextNode(selectedEvents[j].name);
-                            eventRowCell.appendChild(eventRowCellText);
-                            eventRow.appendChild(eventRowCell);
-                            var eventRowCell = document.createElement("td")
-                            var eventRowCellText = document.createTextNode(selectedEvents[j].year);
-                            eventRowCell.appendChild(eventRowCellText);
-                            eventRow.appendChild(eventRowCell);
-                            var eventRowCell = document.createElement("td")
-                            var eventRowCellText = document.createTextNode(selectedEvents[j].ranking_type);
-                            eventRowCell.appendChild(eventRowCellText);
-                            eventRow.appendChild(eventRowCell);
-                            var eventRowCell = document.createElement("td")
-                            var eventRowCellText = document.createTextNode(selectedEvents[j].court_surface);
-                            eventRowCell.appendChild(eventRowCellText);
-                            eventRow.appendChild(eventRowCell);
-                            var eventRowCell = document.createElement("td")
-                            var eventRowCellText = document.createTextNode(selectedEvents[j].setting);
-                            eventRowCell.appendChild(eventRowCellText);
-                            eventRow.appendChild(eventRowCell);
-                            document.getElementById("event_details").appendChild(eventRow);
-                        }
-                    }
-                }
-                $('.header').click(function(){
-                    $(this).nextUntil('tr.header').slideToggle(1000);
-                });
+                createEventTable(stackedBarChartColumnLabels, selectedEvents);
             }
-        })
+        });
     });
 });
 
