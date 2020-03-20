@@ -2,23 +2,45 @@
 {% load static %}
 {% block content %}
 
-<div>
-    <br>
-    <h2>Charts</h2>
-    <br>
-    <select class="selectpicker" multiple id="playerPickerSelect">
-        {% for player in players %}
-        <option value="{{ player.first_name }} {{ player.last_name }}" selected>{{ player.first_name }} {{ player.last_name }}</option>
-        {% endfor %}
-    </select>
+<form id="selectionForm">
+    <div class="form-group">
+        <label>Select players</label><br>
+        <select class="selectpicker" multiple id="playerPickerSelect">
+            {% for player in players %}
+            <option value="{{ player.first_name }} {{ player.last_name }}" selected>{{ player.first_name }} {{ player.last_name }}</option>
+            {% endfor %}
+        </select>
+        <small class="form-text text-muted">Select one or multiple players.</small>
+        <br>
+    </div>
+    <div class="form-group">
+        <label>Select tournament type</label><br>
+        <select class="selectpicker" multiple id="rankingTypeSelect">
+            <option value="Regular" selected>Regular</option>
+            <option value="Slam" selected>Slam</option>
+        </select>
+        <small class="form-text text-muted">Select either regular tournaments (non-slams) or slams, or both.</small>
+        <br>
+    </div>
+    <button type="button" class="btn btn-primary" id="dataPickerBtn">Submit</button>
+</form>
 
-    <select class="selectpicker" multiple id="rankingTypeSelect">
-        <option value="Regular" selected>Regular</option>
-        <option value="Slam" selected>Slam</option>
-    </select>
 
-    <button type="button" class="btn btn-light" id="dataPickerBtn">Select</button>
-</div>
+
+
+    <!--<select class="selectpicker" multiple id="playerPickerSelect">-->
+        <!--{% for player in players %}-->
+        <!--<option value="{{ player.first_name }} {{ player.last_name }}" selected>{{ player.first_name }} {{ player.last_name }}</option>-->
+        <!--{% endfor %}-->
+    <!--</select>-->
+
+    <!--<select class="selectpicker" multiple id="rankingTypeSelect">-->
+        <!--<option value="Regular" selected>Regular</option>-->
+        <!--<option value="Slam" selected>Slam</option>-->
+    <!--</select>-->
+
+    <!--<button type="button" class="btn btn-light" id="dataPickerBtn">Select</button>-->
+<!--</div>-->
 <!--{% for event in events %}-->
     <!--<div>-->
         <!--<h2>name: {{ event.name }}</h2>-->
@@ -30,14 +52,19 @@
 <!--{% endfor %}-->
 
 <!--<div id="myBarChartWrapper"></div>-->
+<h4>Charts</h4>
+<br>
 <div id="myStackedBarChartWrapper"></div>
 <div id="myStackedAgeWonBarChartWrapper"></div>
 <div id="myPieChartWrapper"></div>
 <br>
-<h2>Data</h2>
+<h4>Tournaments</h4>
 <br>
 <div id="eventDetailsWrapper"></div>
 <!--<script src="{% static 'js/app.js' %}"></script>-->
+<h4>Players</h4>
+<br>
+<div id="playerDetailsWrapper"></div>
 
 <script>
 $(document).ready(function() {
@@ -45,6 +72,7 @@ $(document).ready(function() {
 });
 
 var events;
+var players;
 var barChart;
 var pieChart;
 var stackedBarChart;
@@ -53,9 +81,9 @@ let promise = new Promise(function(resolve, reject) {
     $.ajax({
         type: "GET",
         url: "event",
-        success: function(events_json){
-            events = events_json;
-            console.log(events);
+        success: function(requested_data){
+            events = requested_data.events;
+            players = requested_data.players;
             resolve(console.log("it works"));
         }
     })
@@ -524,7 +552,7 @@ promise.then(function(result) {
 		});
 	};
 
-	function createEventTable(stackedBarChartColumnLabels, selectedEvents) {
+	function createEventTable(players, selectedEvents) {
 
         if (document.getElementById('eventDetails')) {
             var eventTable = document.getElementById('eventDetails');
@@ -534,40 +562,39 @@ promise.then(function(result) {
         eventTable.id = "eventDetails";
         eventTable.classList.add("table");
         document.getElementById("eventDetailsWrapper").appendChild(eventTable);
-        var tableHeadingRow = document.createElement("tr");
-        tableHeadingRow.id = "tableHeadingRow"
-        tableHeadingRow.classList.add("thead-dark");
-        document.getElementById("eventDetails").appendChild(tableHeadingRow);
-        var tableHeading = document.createElement("th");
-        tableHeading.innerText = "Player";
-        document.getElementById("tableHeadingRow").appendChild(tableHeading);
-        var tableHeading = document.createElement("th");
-        tableHeading.innerText = "Event";
-        document.getElementById("tableHeadingRow").appendChild(tableHeading);
-        var tableHeading = document.createElement("th");
-        tableHeading.innerText = "Year";
-        document.getElementById("tableHeadingRow").appendChild(tableHeading);
-        var tableHeading = document.createElement("th");
-        tableHeading.innerText = "Type";
-        document.getElementById("tableHeadingRow").appendChild(tableHeading);
-        var tableHeading = document.createElement("th");
-        tableHeading.innerText = "Surface";
-        document.getElementById("tableHeadingRow").appendChild(tableHeading);
-        var tableHeading = document.createElement("th");
-        tableHeading.innerText = "Setting";
-        document.getElementById("tableHeadingRow").appendChild(tableHeading);
-        players = stackedBarChartColumnLabels;
+        let eventTableHeadingRow = document.createElement("tr");
+        eventTableHeadingRow.id = "eventTableHeadingRow"
+        eventTableHeadingRow.classList.add("thead-dark");
+        document.getElementById("eventDetails").appendChild(eventTableHeadingRow);
+        let eventTableHeading = document.createElement("th");
+        eventTableHeading.innerText = "Player";
+        document.getElementById("eventTableHeadingRow").appendChild(eventTableHeading);
+        eventTableHeading = document.createElement("th");
+        eventTableHeading.innerText = "Event";
+        document.getElementById("eventTableHeadingRow").appendChild(eventTableHeading);
+        eventTableHeading = document.createElement("th");
+        eventTableHeading.innerText = "Year";
+        document.getElementById("eventTableHeadingRow").appendChild(eventTableHeading);
+        eventTableHeading = document.createElement("th");
+        eventTableHeading.innerText = "Type";
+        document.getElementById("eventTableHeadingRow").appendChild(eventTableHeading);
+        eventTableHeading = document.createElement("th");
+        eventTableHeading.innerText = "Surface";
+        document.getElementById("eventTableHeadingRow").appendChild(eventTableHeading);
+        eventTableHeading = document.createElement("th");
+        eventTableHeading.innerText = "Setting";
+        document.getElementById("eventTableHeadingRow").appendChild(eventTableHeading);
         for (var i = 0; i < players.length; i++) {
             var playerRow = document.createElement("tr");
             playerRow.classList.add("table-info");
             var playerRowCell = document.createElement("td")
             playerRowCell.colSpan = 6;
-            var playerRowCellText = document.createTextNode(players[i] + " (click to hide)");
+            var playerRowCellText = document.createTextNode(players[i].last_name + " (click to hide)");
             playerRowCell.appendChild(playerRowCellText);
             playerRow.appendChild(playerRowCell);
             document.getElementById("eventDetails").appendChild(playerRow);
             for (var j = 0; j < selectedEvents.length; j++) {
-                if (selectedEvents[j].last_name === players[i]) {
+                if (selectedEvents[j].last_name === players[i].last_name) {
                     var eventRow = document.createElement("tr");
                     var eventRowCell = document.createElement("td")
                     var eventRowCellText = document.createTextNode("");
@@ -597,9 +624,6 @@ promise.then(function(result) {
                 }
             }
         }
-        $(document).ready(function(){
-            feather.replace();
-        });
 
         $('.table-info').click(function(){
             var tableRowCellText = $(this).children().text();
@@ -612,6 +636,49 @@ promise.then(function(result) {
             $(this).nextUntil('tr.table-info').slideToggle(400);
         });
     }
+
+    function createPlayerTable(players) {
+
+        if (document.getElementById('playerDetails')) {
+            var playerTable = document.getElementById('playerDetails');
+            playerTable.parentNode.removeChild(playerTable);
+        }
+
+        var playerTable = document.createElement("table");
+        playerTable.id = "playerDetails";
+        playerTable.classList.add("table");
+        document.getElementById("playerDetailsWrapper").appendChild(playerTable);
+        let playerTableHeadingRow = document.createElement("tr");
+        playerTableHeadingRow.id = "playerTableHeadingRow"
+        playerTableHeadingRow.classList.add("thead-dark");
+        document.getElementById("playerDetails").appendChild(playerTableHeadingRow);
+        playerTableHeading = document.createElement("th");
+        playerTableHeading.innerText = "Name";
+        document.getElementById("playerTableHeadingRow").appendChild(playerTableHeading);
+        playerTableHeading = document.createElement("th");
+        playerTableHeading.innerText = "Date of birth";
+        document.getElementById("playerTableHeadingRow").appendChild(playerTableHeading);
+        playerTableHeading = document.createElement("th");
+        playerTableHeading.innerText = "Nationality";
+        document.getElementById("playerTableHeadingRow").appendChild(playerTableHeading);
+        for (var i = 0; i < players.length; i++) {
+            var playerRow = document.createElement("tr");
+            var playerRowCell = document.createElement("td")
+            var playerRowCellText = document.createTextNode(players[i].first_name + " " + players[i].last_name);
+            playerRowCell.appendChild(playerRowCellText);
+            playerRow.appendChild(playerRowCell);
+            var playerRowCell = document.createElement("td")
+            var playerRowCellText = document.createTextNode(players[i].date_of_birth);
+            playerRowCell.appendChild(playerRowCellText);
+            playerRow.appendChild(playerRowCell);
+            var playerRowCell = document.createElement("td")
+            var playerRowCellText = document.createTextNode(players[i].nationality);
+            playerRowCell.appendChild(playerRowCellText);
+            playerRow.appendChild(playerRowCell);
+            document.getElementById("playerDetails").appendChild(playerRow);
+        }
+    }
+
 
     <!--barChartLabels = prepareBarChartLabels(events);-->
     <!--barChartData = prepareBarChartData(events, barChartLabels);-->
@@ -636,8 +703,8 @@ promise.then(function(result) {
     console.log(stackedAgeWonBarChartData);
     drawStackedAgeWonBarChart(stackedAgeWonBarChartData);
 
-    createEventTable(stackedBarChartColumnLabels, events);
-
+    createEventTable(players, events);
+    createPlayerTable(players);
 
 
     $("#dataPickerBtn").on( "click", function() {
@@ -666,9 +733,9 @@ promise.then(function(result) {
             type: "GET",
             url: "select_player",
             data: {lastNames: playersLastNameStr, rankingTypes: rankingTypesStr},
-            success: function(selected_events_json){
-                selectedEvents = selected_events_json;
-                console.log(selectedEvents);
+            success: function(requested_data){
+                selectedEvents = requested_data.events;
+                selectedPlayers = requested_data.players;
 
                 <!--barChartLabels = prepareBarChartLabels(selectedEvents);-->
                 <!--barChartData = prepareBarChartData(selectedEvents, barChartLabels);-->
@@ -688,7 +755,8 @@ promise.then(function(result) {
                 stackedBarChartColumnLabels = prepareStackedBarChartColumnLabels(selectedEvents);
                 stackedAgeWonBarChartData = prepareStackedAgeWonBarChartData(selectedEvents, stackedAgeWonBarChartAxisLabels, stackedBarChartColumnLabels);
                 drawStackedAgeWonBarChart(stackedAgeWonBarChartData);
-                createEventTable(stackedBarChartColumnLabels, selectedEvents);
+                createEventTable(selectedPlayers, selectedEvents);
+                createPlayerTable(selectedPlayers);
             }
         });
     });
@@ -696,35 +764,35 @@ promise.then(function(result) {
 
 </script>
 
-<button type="button" class="btn btn-light" id="player_details_btn">Display player details</button>
+<!--<button type="button" class="btn btn-light" id="player_details_btn">Display player details</button>-->
 
-<script>
-    $('#player_details_btn').click(function(){
-    console.log("clicked")
-        $.ajax({
-            type: "GET",
-            url: "player",
-            success: function(players_json){
-                players = JSON.parse(players_json);
-                console.log(players)
-                var div = document.createElement("div");
-                div.id = "player_details";
-                document.body.appendChild(div);
-                for (var i = 0; i < players.length; i++) {
-                    var name = document.createElement("p");
-                    name.innerText = "Player name: " + players[i].fields.first_name + " " + players[i].fields.last_name;
-                    document.getElementById("player_details").appendChild(name);
-                    var dob = document.createElement("p");
-                    dob.innerText = "Date of birth: " + players[i].fields.date_of_birth;
-                    document.getElementById("player_details").appendChild(dob);
-                    var nationality = document.createElement("p");
-                    nationality.innerText = "Nationality: " + players[i].fields.nationality;
-                    document.getElementById("player_details").appendChild(nationality);
-                }
-            }
-        })
-    });
+<!--<script>-->
+    <!--$('#player_details_btn').click(function(){-->
+    <!--console.log("clicked")-->
+        <!--$.ajax({-->
+            <!--type: "GET",-->
+            <!--url: "player",-->
+            <!--success: function(players_json){-->
+                <!--players = JSON.parse(players_json);-->
+                <!--console.log(players)-->
+                <!--var div = document.createElement("div");-->
+                <!--div.id = "player_details";-->
+                <!--document.body.appendChild(div);-->
+                <!--for (var i = 0; i < players.length; i++) {-->
+                    <!--var name = document.createElement("p");-->
+                    <!--name.innerText = "Player name: " + players[i].fields.first_name + " " + players[i].fields.last_name;-->
+                    <!--document.getElementById("player_details").appendChild(name);-->
+                    <!--var dob = document.createElement("p");-->
+                    <!--dob.innerText = "Date of birth: " + players[i].fields.date_of_birth;-->
+                    <!--document.getElementById("player_details").appendChild(dob);-->
+                    <!--var nationality = document.createElement("p");-->
+                    <!--nationality.innerText = "Nationality: " + players[i].fields.nationality;-->
+                    <!--document.getElementById("player_details").appendChild(nationality);-->
+                <!--}-->
+            <!--}-->
+        <!--})-->
+    <!--});-->
 
-</script>
+<!--</script>-->
 
 {% endblock %}

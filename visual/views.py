@@ -31,9 +31,26 @@ def select_player(request):
 
     print(events_list)
 
+    players_qs = Player.objects.filter(last_name__in=last_names)
+
+    players_list = []
+
+    for player in players_qs:
+        players_list.append({
+            'first_name': player.first_name,
+            'last_name': player.last_name,
+            'nationality': player.nationality,
+            'date_of_birth': player.date_of_birth
+        })
+
+    requested_data = {
+        "events": events_list,
+        "players": players_list
+    }
+
     # selected_events_json = serializers.serialize('json', events_list)
     # print(selected_events_json)
-    return JsonResponse(events_list, safe=False)
+    return JsonResponse(requested_data)
 
 def event_list(request):
     events = Event.objects.all()
@@ -66,9 +83,26 @@ def event_charts(request):
                 'date_of_birth': event.player.date_of_birth
             })
 
+        players_qs = Player.objects.all()
+
+        players_list = []
+
+        for player in players_qs:
+            players_list.append({
+                'first_name': player.first_name,
+                'last_name': player.last_name,
+                'nationality': player.nationality,
+                'date_of_birth': player.date_of_birth
+            })
+
+        requested_data = {
+            "events": events_list,
+            "players": players_list
+        }
+
         # events_json = serializers.serialize('json', events)
         # print(events_json)
-        return JsonResponse(events_list, safe=False)
+        return JsonResponse(requested_data)
 
 def test_list(request):
     return render(request, 'visual/list.html')
