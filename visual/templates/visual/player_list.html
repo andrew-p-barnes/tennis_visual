@@ -25,9 +25,6 @@
     <button type="button" class="btn btn-primary" id="dataPickerBtn">Submit</button>
 </form>
 
-
-
-
     <!--<select class="selectpicker" multiple id="playerPickerSelect">-->
         <!--{% for player in players %}-->
         <!--<option value="{{ player.first_name }} {{ player.last_name }}" selected>{{ player.first_name }} {{ player.last_name }}</option>-->
@@ -52,6 +49,10 @@
 <!--{% endfor %}-->
 
 <!--<div id="myBarChartWrapper"></div>-->
+<h4>Players</h4>
+<br>
+<div id="playerDetailsWrapper"></div>
+<br><br>
 <h4>Charts</h4>
 <br>
 <div id="myStackedBarChartWrapper"></div>
@@ -62,9 +63,6 @@
 <br>
 <div id="eventDetailsWrapper"></div>
 <!--<script src="{% static 'js/app.js' %}"></script>-->
-<h4>Players</h4>
-<br>
-<div id="playerDetailsWrapper"></div>
 
 <script>
 $(document).ready(function() {
@@ -659,7 +657,7 @@ promise.then(function(result) {
         playerTableHeading.innerText = "Date of birth";
         document.getElementById("playerTableHeadingRow").appendChild(playerTableHeading);
         playerTableHeading = document.createElement("th");
-        playerTableHeading.innerText = "Nationality";
+        playerTableHeading.innerText = "Country";
         document.getElementById("playerTableHeadingRow").appendChild(playerTableHeading);
         for (var i = 0; i < players.length; i++) {
             var playerRow = document.createElement("tr");
