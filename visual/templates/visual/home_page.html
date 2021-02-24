@@ -1,0 +1,44 @@
+{% extends 'visual/base.html' %}
+{% load static %}
+{% block content %}
+
+<script src="{% static 'js/stats.js' %}"></script>
+
+<form id="selectionForm">
+    <div class="form-group">
+        <label>Select players</label><br>
+        <select class="selectpicker" multiple id="playerPickerSelect">
+            {% for player in players %}
+            <option value="{{ player.first_name }} {{ player.last_name }}" selected>{{ player.first_name }} {{ player.last_name }}</option>
+            {% endfor %}
+        </select>
+        <small class="form-text text-muted">Select one or multiple players.</small>
+        <br>
+    </div>
+    <div class="form-group">
+        <label>Select tournament type</label><br>
+        <select class="selectpicker" multiple id="rankingTypeSelect">
+            <option value="Regular" selected>Regular</option>
+            <option value="Slam" selected>Slam</option>
+        </select>
+        <small class="form-text text-muted">Select either regular tournaments (non-slams) or slams, or both.</small>
+        <br>
+    </div>
+    <button type="button" class="btn btn-primary" id="dataPickerBtn">Submit</button>
+</form>
+
+<h4>Players</h4>
+<br>
+<div id="playerDetailsWrapper"></div>
+<br><br>
+<h4>Charts</h4>
+<br>
+<div id="myStackedBarChartWrapper"></div>
+<div id="myStackedAgeWonBarChartWrapper"></div>
+<div id="myPieChartWrapper"></div>
+<br>
+<h4>Tournaments</h4>
+<br>
+<div id="eventDetailsWrapper"></div>
+
+{% endblock %}

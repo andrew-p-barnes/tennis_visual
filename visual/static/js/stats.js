@@ -1,79 +1,5 @@
-{% extends 'visual/base.html' %}
-{% load static %}
-{% block content %}
-
-<form id="selectionForm">
-    <div class="form-group">
-        <label>Select players</label><br>
-        <select class="selectpicker" multiple id="playerPickerSelect">
-            {% for player in players %}
-            <option value="{{ player.first_name }} {{ player.last_name }}" selected>{{ player.first_name }} {{ player.last_name }}</option>
-            {% endfor %}
-        </select>
-        <small class="form-text text-muted">Select one or multiple players.</small>
-        <br>
-    </div>
-    <div class="form-group">
-        <label>Select tournament type</label><br>
-        <select class="selectpicker" multiple id="rankingTypeSelect">
-            <option value="Regular" selected>Regular</option>
-            <option value="Slam" selected>Slam</option>
-        </select>
-        <small class="form-text text-muted">Select either regular tournaments (non-slams) or slams, or both.</small>
-        <br>
-    </div>
-    <button type="button" class="btn btn-primary" id="dataPickerBtn">Submit</button>
-</form>
-
-    <!--<select class="selectpicker" multiple id="playerPickerSelect">-->
-        <!--{% for player in players %}-->
-        <!--<option value="{{ player.first_name }} {{ player.last_name }}" selected>{{ player.first_name }} {{ player.last_name }}</option>-->
-        <!--{% endfor %}-->
-    <!--</select>-->
-
-    <!--<select class="selectpicker" multiple id="rankingTypeSelect">-->
-        <!--<option value="Regular" selected>Regular</option>-->
-        <!--<option value="Slam" selected>Slam</option>-->
-    <!--</select>-->
-
-    <!--<button type="button" class="btn btn-light" id="dataPickerBtn">Select</button>-->
-<!--</div>-->
-<!--{% for event in events %}-->
-    <!--<div>-->
-        <!--<h2>name: {{ event.name }}</h2>-->
-        <!--<p>year: {{ event.year }}</p>-->
-        <!--<p>type: {{ event.ranking_type }}</p>-->
-        <!--<p>setting: {{ event.setting }}</p>-->
-        <!--<p>surface: {{ event.court_surface }}</p>-->
-    <!--</div>-->
-<!--{% endfor %}-->
-
-<!--<div id="myBarChartWrapper"></div>-->
-<h4>Players</h4>
-<br>
-<div id="playerDetailsWrapper"></div>
-<br><br>
-<h4>Charts</h4>
-<br>
-<div id="myStackedBarChartWrapper"></div>
-<div id="myStackedAgeWonBarChartWrapper"></div>
-<div id="myPieChartWrapper"></div>
-<br>
-<h4>Tournaments</h4>
-<br>
-<div id="eventDetailsWrapper"></div>
-<!--<script src="{% static 'js/app.js' %}"></script>-->
-
-<script>
-$(document).ready(function() {
-    $('.selectpicker').selectpicker();
-});
-
 var events;
 var players;
-var barChart;
-var pieChart;
-var stackedBarChart;
 
 let promise = new Promise(function(resolve, reject) {
     $.ajax({
@@ -82,103 +8,12 @@ let promise = new Promise(function(resolve, reject) {
         success: function(requested_data){
             events = requested_data.events;
             players = requested_data.players;
-            resolve(console.log("it works"));
+            resolve();
         }
     })
 });
 
 promise.then(function(result) {
-
-    <!--function prepareBarChartLabels(events) {-->
-
-        <!--console.log(events.length);-->
-
-        <!--var yearsSet = new Set();-->
-
-        <!--for (var i = 0; i < events.length; i++) {-->
-            <!--yearsSet.add(events[i].year);-->
-        <!--}-->
-
-        <!--var yearsArray = Array.from(yearsSet);-->
-        <!--yearsArray.sort();-->
-        <!--return yearsArray;-->
-    <!--}-->
-
-    <!--function prepareBarChartData(events, barChartLabels) {-->
-
-        <!--var numEventsMap = new Map();-->
-
-        <!--for (var i = 0; i < barChartLabels.length; i++) {-->
-            <!--numEventsMap.set(barChartLabels[i], 0);-->
-        <!--}-->
-
-        <!--for (var i = 0; i < events.length; i++) {-->
-            <!--var eventCount = numEventsMap.get(events[i].year);-->
-            <!--eventCount++;-->
-            <!--numEventsMap.set(events[i].year, eventCount);-->
-        <!--}-->
-
-        <!--console.log(numEventsMap);-->
-
-        <!--var numEventsArray = [];-->
-
-        <!--for (var i = 0; i < barChartLabels.length; i++) {-->
-            <!--var eventCount = numEventsMap.get(barChartLabels[i]);-->
-            <!--numEventsArray.push(eventCount);-->
-        <!--}-->
-        <!--return numEventsArray;-->
-    <!--}-->
-
-    <!--function drawBarChart(barChartLabels, barChartData) {-->
-
-        <!--if (document.getElementById('myBarChart')) {-->
-            <!--var chartCanvas = document.getElementById('myBarChart');-->
-            <!--chartCanvas.parentNode.removeChild(chartCanvas);-->
-        <!--}-->
-
-        <!--chartCanvas = document.createElement("canvas");-->
-        <!--chartCanvas.setAttribute("id","myBarChart");-->
-        <!--chartCanvas.setAttribute("width","500");-->
-        <!--chartCanvas.setAttribute("height","500");-->
-        <!--document.getElementById('myBarChartWrapper').appendChild(chartCanvas);-->
-
-        <!--var bar_ctx = document.getElementById('myBarChart');-->
-        <!--barChart = new Chart(bar_ctx, {-->
-            <!--type: 'bar',-->
-            <!--data: {-->
-                <!--labels: barChartLabels,-->
-                <!--datasets: [{-->
-                    <!--label: '# of Events',-->
-                    <!--data: barChartData,-->
-                    <!--backgroundColor: [-->
-                        <!--'rgba(153, 102, 255, 0.2)',-->
-                        <!--'rgba(255, 159, 64, 0.2)',-->
-                        <!--'rgba(5, 9, 64, 0.2)',-->
-                        <!--'rgba(55, 15, 64, 0.2)',-->
-                        <!--'rgba(205, 159, 64, 0.2)'-->
-                    <!--],-->
-                    <!--borderColor: [-->
-                        <!--'rgba(153, 102, 255, 1)',-->
-                        <!--'rgba(255, 159, 64, 1)',-->
-                        <!--'rgba(5, 9, 64, 0.2)',-->
-                        <!--'rgba(55, 15, 64, 0.2)',-->
-                        <!--'rgba(205, 159, 64, 0.2)'-->
-                    <!--],-->
-                    <!--borderWidth: 1-->
-                <!--}]-->
-            <!--},-->
-            <!--options: {-->
-                <!--maintainAspectRatio: false,-->
-                <!--scales: {-->
-                    <!--yAxes: [{-->
-                        <!--ticks: {-->
-                            <!--beginAtZero: true-->
-                        <!--}-->
-                    <!--}]-->
-                <!--}-->
-            <!--}-->
-        <!--});-->
-    <!--}-->
 
     function preparePieChartLabels(events) {
 
@@ -224,8 +59,6 @@ promise.then(function(result) {
             numEventsMap.set(events[i].court_surface, eventCount);
         }
 
-        console.log(numEventsMap);
-
         var numEventsArray = [];
 
         for (var i = 0; i < pieChartLabels.length; i++) {
@@ -264,19 +97,6 @@ promise.then(function(result) {
                 datasets: [{
                     data: pieChartData,
                     backgroundColor: backgroundColours,
-                    <!--[-->
-                        <!--'rgba(153, 102, 255, 0.2)',-->
-                        <!--'rgba(53, 102, 255, 0.2)',-->
-                        <!--'rgba(255, 159, 64, 0.2)',-->
-                        <!--'rgba(200, 19, 64, 0.2)'-->
-                    <!--],-->
-                    borderColor: borderColoursArray,
-                    <!--[-->
-                        <!--'rgba(153, 102, 255, 1)',-->
-                        <!--'rgba(53, 102, 255, 1)',-->
-                        <!--'rgba(255, 159, 64, 1)',-->
-                        <!--'rgba(200, 19, 64, 1)'-->
-                    <!--],-->
                     borderWidth: 1
                 }]
             },
@@ -292,8 +112,6 @@ promise.then(function(result) {
 
     function prepareStackedBarChartAxisLabels(events) {
 
-        console.log(events.length);
-
         var yearsSet = new Set();
 
         for (var i = 0; i < events.length; i++) {
@@ -302,14 +120,10 @@ promise.then(function(result) {
 
         var yearsArray = Array.from(yearsSet);
         yearsArray.sort();
-        console.log("stack years array");
-        console.log(yearsArray);
         return yearsArray;
     }
 
     function prepareStackedBarChartColumnLabels(events) {
-
-        console.log(events.length);
 
         var playersSet = new Set();
 
@@ -319,27 +133,20 @@ promise.then(function(result) {
 
         var playersArray = Array.from(playersSet);
         playersArray.sort();
-        console.log("stack players array");
-        console.log(playersArray);
         return playersArray;
     }
 
     function prepareStackedBarChartData(events, stackedBarChartAxisLabels, stackedBarChartColumnLabels) {
 
         numEventsData = [];
-        console.log("players in stacked data");
-        console.log(stackedBarChartColumnLabels.length);
 
         for (var i = 0; i < stackedBarChartColumnLabels.length; i++) {
 
-            console.log(stackedBarChartColumnLabels[i]);
             var numEventsMap = new Map();
 
             for (var j = 0; j < stackedBarChartAxisLabels.length; j++) {
                 numEventsMap.set(stackedBarChartAxisLabels[j], 0);
             }
-
-            console.log(stackedBarChartColumnLabels[i]);
 
             for (var j = 0; j < events.length; j++) {
                 if (events[j].last_name ===  stackedBarChartColumnLabels[i]) {
@@ -348,8 +155,6 @@ promise.then(function(result) {
                     numEventsMap.set(events[j].year, eventCount);
                 }
             }
-            console.log(stackedBarChartColumnLabels[i]);
-            console.log(numEventsMap);
 
             var numEventsArray = [];
 
@@ -374,7 +179,6 @@ promise.then(function(result) {
             playerDatasets.push(playerDataset);
         }
         stackedBarChartData.datasets = playerDatasets;
-        console.log(stackedBarChartData);
         return stackedBarChartData;
     }
 
@@ -428,8 +232,6 @@ promise.then(function(result) {
 
 	function prepareStackedAgeWonBarChartAxisLabels(events) {
 
-        console.log(events.length);
-
         var yearsSet = new Set();
 
         for (var i = 0; i < events.length; i++) {
@@ -440,28 +242,20 @@ promise.then(function(result) {
 
         var yearsArray = Array.from(yearsSet);
         yearsArray.sort();
-        console.log("stack age won years array");
-        console.log(yearsArray);
         return yearsArray;
     }
 
     function prepareStackedAgeWonBarChartData(events, stackedAgeWonBarChartAxisLabels, stackedBarChartColumnLabels) {
 
         numEventsData = [];
-        console.log("players in stacked data");
-        console.log(stackedBarChartColumnLabels.length);
 
         for (var i = 0; i < stackedBarChartColumnLabels.length; i++) {
 
-            console.log(stackedBarChartColumnLabels[i]);
             var numEventsMap = new Map();
 
             for (var j = 0; j < stackedAgeWonBarChartAxisLabels.length; j++) {
                 numEventsMap.set(stackedAgeWonBarChartAxisLabels[j], 0);
             }
-
-            console.log(stackedBarChartColumnLabels[i]);
-            console.log(numEventsMap);
 
             for (var j = 0; j < events.length; j++) {
                 if (events[j].last_name ===  stackedBarChartColumnLabels[i]) {
@@ -472,8 +266,6 @@ promise.then(function(result) {
                     numEventsMap.set(ageWon, eventCount);
                 }
             }
-            console.log(stackedBarChartColumnLabels[i]);
-            console.log(numEventsMap);
 
             var numEventsArray = [];
 
@@ -498,7 +290,6 @@ promise.then(function(result) {
             playerDatasets.push(playerDataset);
         }
         stackedAgeWonBarChartData.datasets = playerDatasets;
-        console.log(stackedBarChartData);
         return stackedAgeWonBarChartData;
     }
 
@@ -587,7 +378,7 @@ promise.then(function(result) {
             playerRow.classList.add("table-info");
             var playerRowCell = document.createElement("td")
             playerRowCell.colSpan = 6;
-            var playerRowCellText = document.createTextNode(players[i].last_name + " (click to hide)");
+            var playerRowCellText = document.createTextNode(players[i].last_name + " (click to show)");
             playerRowCell.appendChild(playerRowCellText);
             playerRow.appendChild(playerRowCell);
             document.getElementById("eventDetails").appendChild(playerRow);
@@ -622,6 +413,10 @@ promise.then(function(result) {
                 }
             }
         }
+
+        $('.table-info').each(function() {
+            $(this).nextUntil('.table-info').slideToggle(400);
+        });
 
         $('.table-info').click(function(){
             var tableRowCellText = $(this).children().text();
@@ -677,28 +472,18 @@ promise.then(function(result) {
         }
     }
 
-
-    <!--barChartLabels = prepareBarChartLabels(events);-->
-    <!--barChartData = prepareBarChartData(events, barChartLabels);-->
-    <!--drawBarChart(barChartLabels, barChartData);-->
-
-    pieChartLabels = preparePieChartLabels(events);
-    pieChartBackgroundColours = getPieChartBackgroundColours(pieChartLabels);
-    pieChartData = preparePieChartData(events, pieChartLabels);
+    let pieChartLabels = preparePieChartLabels(events);
+    let pieChartBackgroundColours = getPieChartBackgroundColours(pieChartLabels);
+    let pieChartData = preparePieChartData(events, pieChartLabels);
     drawPieChart(pieChartLabels, pieChartBackgroundColours, pieChartData);
 
-    stackedBarChartAxisLabels = prepareStackedBarChartAxisLabels(events);
-    console.log(stackedBarChartAxisLabels);
-    stackedBarChartColumnLabels = prepareStackedBarChartColumnLabels(events);
-    console.log(stackedBarChartColumnLabels);
-    stackedBarChartData = prepareStackedBarChartData(events, stackedBarChartAxisLabels, stackedBarChartColumnLabels);
-    console.log(stackedBarChartData);
+    let stackedBarChartAxisLabels = prepareStackedBarChartAxisLabels(events);
+    let stackedBarChartColumnLabels = prepareStackedBarChartColumnLabels(events);
+    let stackedBarChartData = prepareStackedBarChartData(events, stackedBarChartAxisLabels, stackedBarChartColumnLabels);
     drawStackedBarChart(stackedBarChartData);
 
-    stackedAgeWonBarChartAxisLabels = prepareStackedAgeWonBarChartAxisLabels(events);
-    console.log(stackedAgeWonBarChartAxisLabels);
-    stackedAgeWonBarChartData = prepareStackedAgeWonBarChartData(events, stackedAgeWonBarChartAxisLabels, stackedBarChartColumnLabels);
-    console.log(stackedAgeWonBarChartData);
+    let stackedAgeWonBarChartAxisLabels = prepareStackedAgeWonBarChartAxisLabels(events);
+    let stackedAgeWonBarChartData = prepareStackedAgeWonBarChartData(events, stackedAgeWonBarChartAxisLabels, stackedBarChartColumnLabels);
     drawStackedAgeWonBarChart(stackedAgeWonBarChartData);
 
     createEventTable(players, events);
@@ -706,26 +491,19 @@ promise.then(function(result) {
 
 
     $("#dataPickerBtn").on( "click", function() {
-        console.log("data picker");
         var players = $("#playerPickerSelect").val();
         var playersArray = players.toString().split(",");
-        console.log("players picked " + playersArray);
         <!--var playersLastNameArray = [];-->
         var playersLastNameStr = "";
         for (var i = 0; i < playersArray.length; i++) {
-            <!--playersLastNameArray.push(playersArray[i].split(" ")[1]);-->
             playersLastNameStr = playersLastNameStr + " " + playersArray[i].split(" ")[1];
         }
         playersLastNameStr = playersLastNameStr.trim();
-        <!--console.log(playersLastNameArray);-->
-        console.log(playersLastNameStr);
         var rankingTypes = $("#rankingTypeSelect").val();
-        console.log(rankingTypes);
         var rankingTypesStr = "";
         for (var i = 0; i < rankingTypes.length; i++) {
             rankingTypesStr = rankingTypesStr + " " + rankingTypes[i];
         }
-        console.log(rankingTypesStr);
 
         $.ajax({
             type: "GET",
@@ -735,62 +513,23 @@ promise.then(function(result) {
                 selectedEvents = requested_data.events;
                 selectedPlayers = requested_data.players;
 
-                <!--barChartLabels = prepareBarChartLabels(selectedEvents);-->
-                <!--barChartData = prepareBarChartData(selectedEvents, barChartLabels);-->
-                <!--console.log(barChartLabels);-->
-                <!--console.log(barChartData);-->
-                <!--drawBarChart(barChartLabels, barChartData);-->
-
-                pieChartLabels = preparePieChartLabels(selectedEvents);
-                pieChartBackgroundColours = getPieChartBackgroundColours(pieChartLabels);
-                pieChartData = preparePieChartData(selectedEvents, pieChartLabels);
+                let pieChartLabels = preparePieChartLabels(selectedEvents);
+                let pieChartBackgroundColours = getPieChartBackgroundColours(pieChartLabels);
+                let pieChartData = preparePieChartData(selectedEvents, pieChartLabels);
                 drawPieChart(pieChartLabels, pieChartBackgroundColours, pieChartData);
-                stackedBarChartAxisLabels = prepareStackedBarChartAxisLabels(selectedEvents);
-                stackedBarChartColumnLabels = prepareStackedBarChartColumnLabels(selectedEvents);
-                stackedBarChartData = prepareStackedBarChartData(selectedEvents, stackedBarChartAxisLabels, stackedBarChartColumnLabels);
+
+                let stackedBarChartAxisLabels = prepareStackedBarChartAxisLabels(selectedEvents);
+                let stackedBarChartColumnLabels = prepareStackedBarChartColumnLabels(selectedEvents);
+                let stackedBarChartData = prepareStackedBarChartData(selectedEvents, stackedBarChartAxisLabels, stackedBarChartColumnLabels);
                 drawStackedBarChart(stackedBarChartData);
-                stackedAgeWonBarChartAxisLabels = prepareStackedAgeWonBarChartAxisLabels(selectedEvents);
-                stackedBarChartColumnLabels = prepareStackedBarChartColumnLabels(selectedEvents);
-                stackedAgeWonBarChartData = prepareStackedAgeWonBarChartData(selectedEvents, stackedAgeWonBarChartAxisLabels, stackedBarChartColumnLabels);
+
+                let stackedAgeWonBarChartAxisLabels = prepareStackedAgeWonBarChartAxisLabels(selectedEvents);
+                let stackedAgeWonBarChartData = prepareStackedAgeWonBarChartData(selectedEvents, stackedAgeWonBarChartAxisLabels, stackedBarChartColumnLabels);
                 drawStackedAgeWonBarChart(stackedAgeWonBarChartData);
+
                 createEventTable(selectedPlayers, selectedEvents);
                 createPlayerTable(selectedPlayers);
             }
         });
     });
 });
-
-</script>
-
-<!--<button type="button" class="btn btn-light" id="player_details_btn">Display player details</button>-->
-
-<!--<script>-->
-    <!--$('#player_details_btn').click(function(){-->
-    <!--console.log("clicked")-->
-        <!--$.ajax({-->
-            <!--type: "GET",-->
-            <!--url: "player",-->
-            <!--success: function(players_json){-->
-                <!--players = JSON.parse(players_json);-->
-                <!--console.log(players)-->
-                <!--var div = document.createElement("div");-->
-                <!--div.id = "player_details";-->
-                <!--document.body.appendChild(div);-->
-                <!--for (var i = 0; i < players.length; i++) {-->
-                    <!--var name = document.createElement("p");-->
-                    <!--name.innerText = "Player name: " + players[i].fields.first_name + " " + players[i].fields.last_name;-->
-                    <!--document.getElementById("player_details").appendChild(name);-->
-                    <!--var dob = document.createElement("p");-->
-                    <!--dob.innerText = "Date of birth: " + players[i].fields.date_of_birth;-->
-                    <!--document.getElementById("player_details").appendChild(dob);-->
-                    <!--var nationality = document.createElement("p");-->
-                    <!--nationality.innerText = "Nationality: " + players[i].fields.nationality;-->
-                    <!--document.getElementById("player_details").appendChild(nationality);-->
-                <!--}-->
-            <!--}-->
-        <!--})-->
-    <!--});-->
-
-<!--</script>-->
-
-{% endblock %}

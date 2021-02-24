@@ -1,22 +1,22 @@
 from django.shortcuts import render
 from .models import Player, Event
 from django.http import JsonResponse
-from django.core import serializers
 import requests
 from bs4 import BeautifulSoup
 import re
 
 # Create your views here.
 
+
 def select_player(request):
-    print("got here")
     request_players = request.GET['lastNames']
     last_names = request_players.split()
     print(last_names)
     request_ranking_types = request.GET['rankingTypes']
     ranking_types = request_ranking_types.split()
     print(ranking_types)
-    events_qs = Event.objects.filter(player__last_name__in=last_names).filter(ranking_type__in=ranking_types).select_related('player')
+    events_qs = Event.objects.filter(player__last_name__in=last_names).filter(ranking_type__in=ranking_types)\
+        .select_related('player')
     print(events_qs)
 
     events_list = []
@@ -50,26 +50,15 @@ def select_player(request):
         "events": events_list,
         "players": players_list
     }
-
-    # selected_events_json = serializers.serialize('json', events_list)
-    # print(selected_events_json)
     return JsonResponse(requested_data)
 
-def event_list(request):
-    players = Player.objects.all()
-    # events = Event.objects.all()
-    return render(request, 'visual/player_list.html', {'players': players})
 
 def player_list(request):
-    print("reached")
-    if request.method == 'GET':
-        players = Player.objects.all()
-        players_json = serializers.serialize('json', players)
-        print(players_json)
-        return JsonResponse(players_json, safe=False)
+    players = Player.objects.all()
+    return render(request, 'visual/home_page.html', {'players': players})
+
 
 def event_charts(request):
-    print("reached charts")
     if request.method == 'GET':
         events_qs = Event.objects.all().select_related('player')
 
@@ -102,17 +91,13 @@ def event_charts(request):
             "events": events_list,
             "players": players_list
         }
-
-        # events_json = serializers.serialize('json', events)
-        # print(events_json)
         return JsonResponse(requested_data)
 
-def test_list(request):
-    return render(request, 'visual/list.html')
 
 def render_update_view(request):
     players = Player.objects.all()
     return render(request, 'visual/update_page.html', {'players': players})
+
 
 def event_creator(request):
     if request.method == 'GET':
@@ -128,11 +113,12 @@ def event_creator(request):
             "Murray": "https://www.atptour.com/en/players/andy-murray/mc10/titles-and-finals",
             "del_Potro": "https://www.atptour.com/en/players/juan-martin-del-potro/d683/titles-and-finals",
             "Wawrinka": "https://www.atptour.com/en/players/stan-wawrinka/w367/titles-and-finals",
-            "Cilic": "https://www.atptour.com/en/players/marin-cilic/c977/titles-and-finals"
+            "Cilic": "https://www.atptour.com/en/players/marin-cilic/c977/titles-and-finals",
+            "Thiem": "https://www.atptour.com/en/players/dominic-thiem/tb69/titles-and-finals"
         }
 
         player_url = player_url_dict[last_name]
-        page = requests.get(player_url)
+        page = requests.get(player_url, headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:85.0) Gecko/20100101 Firefox/85.0'})
 
         soup = BeautifulSoup(page.content, 'html.parser')
         string = soup.get_text()
